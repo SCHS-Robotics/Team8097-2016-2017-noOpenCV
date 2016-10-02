@@ -3,6 +3,7 @@ package org.firstinspires.ftc.robotcontroller.external.samples;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -23,12 +24,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 public class HardwarePushbot
 {
+    public int maxNumLoops = 10;
+
     /* Public OpMode members. */
-    public DcMotor  leftMotor   = null;
-    public DcMotor  rightMotor  = null;
-    public DcMotor  armMotor    = null;
+    public DcMotor  leftMotor;
+    public DcMotor  rightMotor;
+    public DcMotor  armMotor;
     public Servo    leftClaw    = null;
     public Servo    rightClaw   = null;
+    public UltrasonicSensor frontUltrasonic;
 
     public static final double MID_SERVO       =  0.5 ;
     public static final double ARM_UP_POWER    =  0.45 ;
@@ -49,7 +53,7 @@ public class HardwarePushbot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        leftMotor   = hwMap.dcMotor.get("left_drive");
+        leftMotor   = ahwMap.dcMotor.get("left_drive");
         rightMotor  = hwMap.dcMotor.get("right_drive");
         armMotor    = hwMap.dcMotor.get("left_arm");
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -83,7 +87,6 @@ public class HardwarePushbot
      * @throws InterruptedException
      */
     public void waitForTick(long periodMs) throws InterruptedException {
-
         long  remaining = periodMs - (long)period.milliseconds();
 
         // sleep for the remaining portion of the regular cycle period.
