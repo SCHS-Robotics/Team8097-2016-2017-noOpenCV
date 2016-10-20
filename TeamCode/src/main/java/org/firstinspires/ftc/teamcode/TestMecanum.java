@@ -42,17 +42,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all iterative OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="MecanumTest", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
-public class TestMecanum extends OpMode
-{
+@TeleOp(name = "MecanumTest", group = "Iterative Opmode")
+// @Autonomous(...) is the other common choice
+public class TestMecanum extends OpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftMotorback;
@@ -107,15 +107,30 @@ public class TestMecanum extends OpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        leftMotorback.setPower(gamepad1.left_stick_y +gamepad1.left_stick_x);
-        rightMotorback.setPower(-gamepad1.left_stick_y +gamepad1.left_stick_x);
-        leftMotorfront.setPower(gamepad1.left_stick_y -gamepad1.left_stick_x);
-        rightMotorfront.setPower(-gamepad1.left_stick_y -gamepad1.left_stick_x);
+        leftMotorback.setPower((gamepad1.left_stick_y + gamepad1.left_stick_x) / 2);
+        rightMotorback.setPower((-gamepad1.left_stick_y + gamepad1.left_stick_x) / 2);
+        leftMotorfront.setPower((gamepad1.left_stick_y - gamepad1.left_stick_x) / 2);
+        rightMotorfront.setPower((-gamepad1.left_stick_y - gamepad1.left_stick_x) / 2);
 
-        // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-        // leftMotor.setPower(-gamepad1.left_stick_y);
-        // rightMotor.setPower(-gamepad1.right_stick_y);
+        if (gamepad1.dpad_right) {
+            leftMotorback.setPower(-1);
+            rightMotorback.setPower(-1);
+            leftMotorfront.setPower(-1);
+            rightMotorfront.setPower(-1);
+        }
+        else
+        if (gamepad1.dpad_left) {
+            leftMotorback.setPower(1);
+            rightMotorback.setPower(1);
+            leftMotorfront.setPower(1);
+            rightMotorfront.setPower(1);
+        }
     }
+
+    // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+    // leftMotor.setPower(-gamepad1.left_stick_y);
+    // rightMotor.setPower(-gamepad1.right_stick_y);
+
 
     /*
      * Code to run ONCE after the driver hits STOP
