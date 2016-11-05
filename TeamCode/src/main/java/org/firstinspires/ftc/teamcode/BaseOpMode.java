@@ -92,7 +92,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public ModernRoboticsI2cRangeSensor getRangeSensor(String name) throws InterruptedException {
-        ModernRoboticsI2cRangeSensor rangeSensor = new ModernRoboticsI2cRangeSensor(hardwareMap.i2cDeviceSynch.get(name));
+        ModernRoboticsI2cRangeSensor rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, name);
         if (isInI2cAddressList(rangeSensor.getI2cAddress())) {//TODO getI2cAddress() is not correct. It only returns what has been set using setI2cAddress() in the code, not the actual address of the device.
             byte i2cAddressByte = (byte) I2cAddressChange.RANGE_SENSOR_ORIGINAL_ADDRESS.get8Bit();
             while (isInI2cAddressList(i2cAddressByte)) {
@@ -110,8 +110,8 @@ public abstract class BaseOpMode extends LinearOpMode {
         motorBackRight = hardwareMap.dcMotor.get("backRight");
         motorBackLeft = hardwareMap.dcMotor.get("backLeft");
 
-        rightRangeSensor = new ModernRoboticsI2cRangeSensor(hardwareMap.i2cDeviceSynch.get("rightRange"));
-        leftRangeSensor = new ModernRoboticsI2cRangeSensor(hardwareMap.i2cDeviceSynch.get("leftRange"));
+        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
+        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
         backTapeSensor = hardwareMap.colorSensor.get("backTape");

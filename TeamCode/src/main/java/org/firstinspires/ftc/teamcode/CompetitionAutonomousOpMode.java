@@ -15,8 +15,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         motorBackRight = hardwareMap.dcMotor.get("backRight");
         motorBackLeft = hardwareMap.dcMotor.get("backLeft");
 
-        rightRangeSensor = new ModernRoboticsI2cRangeSensor(hardwareMap.i2cDeviceSynch.get("rightRange"));
-        leftRangeSensor = new ModernRoboticsI2cRangeSensor(hardwareMap.i2cDeviceSynch.get("leftRange"));
+        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
+        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
         backTapeSensor = hardwareMap.colorSensor.get("backTape");
