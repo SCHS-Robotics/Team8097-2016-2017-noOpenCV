@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import android.content.SharedPreferences.Editor;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
-@Autonomous(name = "Calibrate", group = "OpMode")
+@TeleOp(name = "Calibrate", group = "Util")
 public class CalibrateOpMode extends BaseOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
