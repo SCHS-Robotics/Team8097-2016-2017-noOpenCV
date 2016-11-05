@@ -32,9 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -42,44 +40,25 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p>
+ * <p/>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p>
+ * <p/>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Button Test", group = "OpMode")
-public class ButtonTest extends BaseOpMode {
+@TeleOp(name = "Blue Autonomous", group = "OpMode")
+public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
 
-    /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-
-    private ColorSensor leftColor;
-    private ColorSensor rightColor;
-    private Servo leftFlap;
-    private Servo rightFlap;
-    private double leftFlapInitPos = 0.704;
-    private double rightFlapInitPos = 0.114;
-    private double leftFlapEndPos = 0.466;
-    private double rightFlapEndPos = 0.352;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        leftColor = hardwareMap.colorSensor.get("leftColor");
-        rightColor = hardwareMap.colorSensor.get("rightColor");
-        leftFlap = hardwareMap.servo.get("leftFlap");
-        rightFlap = hardwareMap.servo.get("rightFlap");
-
-        leftColor.enableLed(false);
-        rightColor.enableLed(false);
-
-        leftFlap.setPosition(leftFlapInitPos);
-        rightFlap.setPosition(rightFlapInitPos);
+        initialize();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -88,18 +67,10 @@ public class ButtonTest extends BaseOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Left Color", leftColor.argb());
-            telemetry.addData("Right Color", rightColor.argb());
-
-            if (leftColor.red() > rightColor.red() && leftColor.blue() < rightColor.blue()) {
-                leftFlap.setPosition(leftFlapEndPos);
-                rightFlap.setPosition(rightFlapInitPos);
-            } else if (rightColor.red() > leftColor.red() && rightColor.blue() < leftColor.blue()) {
-                rightFlap.setPosition(rightFlapEndPos);
-                leftFlap.setPosition(leftFlapInitPos);
-            }
-
             telemetry.update();
+
+            //do stuff
+
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }

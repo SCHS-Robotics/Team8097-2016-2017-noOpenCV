@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Test Servos", group = "Iterative Opmode")
+@TeleOp(name = "Test Servos", group = "OpMode")
 public class TestServos extends OpMode {
     double pos1 = 0.5;
     double pos2 = 0.5;
