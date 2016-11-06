@@ -27,7 +27,9 @@ public class CalibrateOpMode extends BaseOpMode {
         frontValue = 0;
         backValue = 0;
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
-        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+        frontTapeSensor.setI2cAddress(frontTapeI2c);
+        frontTapeSensor.enableLed(true);
+//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -39,14 +41,14 @@ public class CalibrateOpMode extends BaseOpMode {
             telemetry.update();
 
             frontTapeSensor.enableLed(true);
-            backTapeSensor.enableLed(true);
+//            backTapeSensor.enableLed(true);
             telemetry.addData("front light sensor", frontTapeSensor.alpha());
-            telemetry.addData("back light sensor", backTapeSensor.alpha());
+//            telemetry.addData("back light sensor", backTapeSensor.alpha());
             if (FtcRobotControllerActivity.calibrateTape) {
                 if (readings < 100) {
                     readings++;
                     frontValue += frontTapeSensor.alpha();
-                    backValue += backTapeSensor.alpha();
+//                    backValue += backTapeSensor.alpha();
                     setButtonsClickable(false);
                 } else {
                     readings = 0;
@@ -62,7 +64,7 @@ public class CalibrateOpMode extends BaseOpMode {
                 if (readings < 100) {
                     readings++;
                     frontValue += frontTapeSensor.alpha();
-                    backValue += backTapeSensor.alpha();
+//                    backValue += backTapeSensor.alpha();
                     setButtonsClickable(false);
                 } else {
                     readings = 0;
@@ -77,6 +79,7 @@ public class CalibrateOpMode extends BaseOpMode {
             } else {
                 setButtonsClickable(true);
             }
+            sleep(1);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }

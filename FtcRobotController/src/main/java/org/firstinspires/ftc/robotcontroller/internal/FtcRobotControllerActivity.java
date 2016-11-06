@@ -256,7 +256,7 @@ public class FtcRobotControllerActivity extends Activity {
         calibrateTapeButt = (Button) findViewById(R.id.calibrateTapeButt);
         calibrationSP = getSharedPreferences(CALIBRATE_SP, MODE_PRIVATE);
         calibrateTapeButt.setText("Calibrate Tape\nF: " + (float) ((int) (calibrationSP.getFloat("frontTapeValue", -2) * 100) / 100.0) + "  B: " + (float) ((int) (calibrationSP.getFloat("backTapeValue", -2) * 100) / 100.0));
-        calibrateGroundButt.setText("Calibrate Ground\nF: " + (float) ((int) (calibrationSP.getFloat("frontGroundValue", -2) * 100) / 100.0) + "  B: " + (float) ((int) (calibrationSP.getFloat("backGroundValue", -2) * 100) / 100.0));
+        calibrateGroundButt.setText("Calibrate Floor\nF: " + (float) ((int) (calibrationSP.getFloat("frontGroundValue", -2) * 100) / 100.0) + "  B: " + (float) ((int) (calibrationSP.getFloat("backGroundValue", -2) * 100) / 100.0));
 
 
         programmingModeController = new ProgrammingModeControllerImpl(
@@ -576,7 +576,7 @@ public class FtcRobotControllerActivity extends Activity {
         public void handleMessage(Message msg) {
             float front = (float) (msg.arg1 / 100.0);
             float back = (float) (msg.arg2 / 100.0);
-            calibrateGroundButt.setText("Calibrate Ground\nF: " + front + "  B: " + back);
+            calibrateGroundButt.setText("Calibrate Floor\nF: " + front + "  B: " + back);
         }
     };
 

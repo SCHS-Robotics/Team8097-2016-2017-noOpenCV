@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/robotIcon"
-            android:padding="8dp"
+            android:paddingLeft="8dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white"
             android:textStyle="bold" />
@@ -82,7 +82,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_toEndOf="@id/textDeviceName"
+            android:layout_below="@id/textDeviceName"
+            android:layout_toEndOf="@id/robotIcon"
             android:layout_toStartOf="@id/menu_buttons"
             android:orientation="horizontal">
 
@@ -93,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 android:layout_weight="1"
                 android:clickable="false"
                 android:onClick="calibrateGround"
-                android:text="Calibrate Ground"
+                android:text="Calibrate Floor"
                 android:textColor="@color/white"
                 android:textSize="11sp" />
 

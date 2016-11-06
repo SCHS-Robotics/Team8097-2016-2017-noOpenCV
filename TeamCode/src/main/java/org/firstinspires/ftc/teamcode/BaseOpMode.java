@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class BaseOpMode extends LinearOpMode {
@@ -27,8 +26,14 @@ public abstract class BaseOpMode extends LinearOpMode {
     ColorSensor leftColorSensor;
     ColorSensor frontTapeSensor;
     ColorSensor backTapeSensor;
+    I2cAddr leftColorI2c = I2cAddr.create8bit(0x3c);
+    I2cAddr rightColorI2c = I2cAddr.create8bit(0x4c);
+    I2cAddr frontTapeI2c = I2cAddr.create8bit(0x5c);
+//    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
     ModernRoboticsI2cRangeSensor leftRangeSensor;
     ModernRoboticsI2cRangeSensor rightRangeSensor;
+    I2cAddr rightRangeI2c = I2cAddr.create8bit(0x28);
+    I2cAddr leftRangeI2c = I2cAddr.create8bit(0x38);
 
     double leftFlapInitPos = 0.704;
     double rightFlapInitPos = 0.114;
@@ -62,48 +67,6 @@ public abstract class BaseOpMode extends LinearOpMode {
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private ArrayList<Byte> I2cAddresses = new ArrayList<>();
-    public DeviceInterfaceModule DIM;
-
-    private boolean isInI2cAddressList(I2cAddr i2cAddress) {
-        return isInI2cAddressList((byte) i2cAddress.get8Bit());
-    }
-
-    private boolean isInI2cAddressList(byte i2cAddressByte) {
-        for (byte b : I2cAddresses) {
-            if (i2cAddressByte == b) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public ColorSensor getColorSensor(String name) throws InterruptedException {
-        ColorSensor colorSensor = hardwareMap.colorSensor.get(name);
-        if (isInI2cAddressList(colorSensor.getI2cAddress())) {//TODO getI2cAddress() is not correct. It only returns what has been set using setI2cAddress() in the code, not the actual address of the device.
-            byte i2cAddressByte = I2cAddressChange.COLOR_SENSOR_ORIGINAL_ADDRESS;
-            while (isInI2cAddressList(i2cAddressByte)) {
-                i2cAddressByte += 0x10;
-            }
-            int port = 0;//TODO print getConnectionInfo() to see if it has port number
-            I2cAddressChange.changeI2CAddress(this, DIM, port, colorSensor.getI2cAddress(), i2cAddressByte, I2cAddressChange.COLOR_SENSOR_FIRMWARE_REV, I2cAddressChange.COLOR_SENSOR_SENSOR_ID);
-        }
-        return colorSensor;
-    }
-
-    public ModernRoboticsI2cRangeSensor getRangeSensor(String name) throws InterruptedException {
-        ModernRoboticsI2cRangeSensor rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, name);
-        if (isInI2cAddressList(rangeSensor.getI2cAddress())) {//TODO getI2cAddress() is not correct. It only returns what has been set using setI2cAddress() in the code, not the actual address of the device.
-            byte i2cAddressByte = (byte) I2cAddressChange.RANGE_SENSOR_ORIGINAL_ADDRESS.get8Bit();
-            while (isInI2cAddressList(i2cAddressByte)) {
-                i2cAddressByte += 0x10;
-            }
-            int port = 0;//TODO print getConnectionInfo() to see if it has port number
-            I2cAddressChange.changeI2CAddress(this, DIM, port, rangeSensor.getI2cAddress(), i2cAddressByte, I2cAddressChange.RANGE_SENSOR_FIRMWARE_REV, I2cAddressChange.RANGE_SENSOR_SENSOR_ID);
-        }
-        return rangeSensor;
-    }
-
     private void allInit() {
         motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
         motorFrontRight = hardwareMap.dcMotor.get("frontRight");
@@ -112,6 +75,8 @@ public abstract class BaseOpMode extends LinearOpMode {
 
         rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
         leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
+        rightRangeSensor.setI2cAddress(rightRangeI2c);
+        leftRangeSensor.setI2cAddress(leftRangeI2c);
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
         backTapeSensor = hardwareMap.colorSensor.get("backTape");
@@ -120,6 +85,8 @@ public abstract class BaseOpMode extends LinearOpMode {
 
         rightColorSensor = hardwareMap.colorSensor.get("rightColor");
         leftColorSensor = hardwareMap.colorSensor.get("leftColor");
+        rightColorSensor.setI2cAddress(rightColorI2c);
+        leftColorSensor.setI2cAddress(leftColorI2c);
         rightColorSensor.enableLed(false);
         leftColorSensor.enableLed(false);
 

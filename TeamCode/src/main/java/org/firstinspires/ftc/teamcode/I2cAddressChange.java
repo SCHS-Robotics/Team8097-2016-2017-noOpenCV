@@ -92,7 +92,7 @@ public class I2cAddressChange extends LinearOpMode{
         changeI2CAddress(this, DIM, 1, COLOR_SENSOR_ORIGINAL_ADDRESS, (byte) (COLOR_SENSOR_ORIGINAL_ADDRESS + 0x10), I2cAddressChange.COLOR_SENSOR_FIRMWARE_REV, I2cAddressChange.COLOR_SENSOR_SENSOR_ID);
         changeI2CAddress(this, DIM, 2, COLOR_SENSOR_ORIGINAL_ADDRESS, (byte) (COLOR_SENSOR_ORIGINAL_ADDRESS + 0x20), I2cAddressChange.COLOR_SENSOR_FIRMWARE_REV, I2cAddressChange.COLOR_SENSOR_SENSOR_ID);
         changeI2CAddress(this, DIM, 3, COLOR_SENSOR_ORIGINAL_ADDRESS, (byte) (COLOR_SENSOR_ORIGINAL_ADDRESS + 0x30), I2cAddressChange.COLOR_SENSOR_FIRMWARE_REV, I2cAddressChange.COLOR_SENSOR_SENSOR_ID);
-        changeI2CAddress(this, DIM, 5, RANGE_SENSOR_ORIGINAL_ADDRESS, (byte) (RANGE_SENSOR_ORIGINAL_ADDRESS.get8Bit() + 0x10), I2cAddressChange.RANGE_SENSOR_FIRMWARE_REV, I2cAddressChange.RANGE_SENSOR_SENSOR_ID);
+//        changeI2CAddress(this, DIM, 5, RANGE_SENSOR_ORIGINAL_ADDRESS, (byte) (RANGE_SENSOR_ORIGINAL_ADDRESS.get8Bit() + 0x10), I2cAddressChange.RANGE_SENSOR_FIRMWARE_REV, I2cAddressChange.RANGE_SENSOR_SENSOR_ID);
     }
 
     public static void changeI2CAddress(LinearOpMode opMode, DeviceInterfaceModule dim, int port, byte currentAddressByte, byte newAddressByte, byte firmwareRev, byte sensorId) throws InterruptedException {
@@ -146,7 +146,7 @@ public class I2cAddressChange extends LinearOpMode{
             count++;
             // if we go too long with failure, we probably are expecting the wrong bytes.
             if (count >= 10) {
-                opMode.telemetry.addData("I2cAddressChange", String.format("Looping too long with no change, probably have the wrong address. Current address: 0x%02x", currentAddress));
+                opMode.telemetry.addData("I2cAddressChange", String.format("Looping too long with no change, probably have the wrong address. Current address: 0x%02x", currentAddress.get8Bit()));
                 opMode.telemetry.update();
             }
         }
@@ -178,9 +178,9 @@ public class I2cAddressChange extends LinearOpMode{
             opMode.sleep(1000);
         }
 
-        opMode.telemetry.addData("I2cAddressChange", "Successfully changed the I2C address. New address: 0x%02x", newAddress);
+        opMode.telemetry.addData("I2cAddressChange", "Successfully changed the I2C address. New address: 0x%02x", newAddress.get8Bit());
         opMode.telemetry.update();
-        RobotLog.i("Successfully changed the I2C address." + String.format("New address: 0x%02x", newAddress));
+        RobotLog.i("Successfully changed the I2C address." + String.format("New address: 0x%02x", newAddress.get8Bit()));
 
 //        /**** IMPORTANT NOTE ******/
 //        // You need to add a line like this at the top of your op mode

@@ -32,10 +32,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,8 +51,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Button Test", group = "OpMode")
-public class ButtonTest extends BaseOpMode {
+@Autonomous(name = "Range Test", group = "OpMode")
+public class RangeTest extends BaseOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -61,17 +62,10 @@ public class ButtonTest extends BaseOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        leftColorSensor = hardwareMap.colorSensor.get("leftColor");
-        rightColorSensor = hardwareMap.colorSensor.get("rightColor");
-        rightColorSensor.setI2cAddress(rightColorI2c);
-        leftColorSensor.setI2cAddress(leftColorI2c);
-        leftColorSensor.enableLed(false);
-        rightColorSensor.enableLed(false);
-
-        leftFlapServo = hardwareMap.servo.get("leftFlap");
-        rightFlapServo = hardwareMap.servo.get("rightFlap");
-        leftFlapServo.setPosition(leftFlapInitPos);
-        rightFlapServo.setPosition(rightFlapInitPos);
+        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
+        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
+        rightRangeSensor.setI2cAddress(rightRangeI2c);
+        leftRangeSensor.setI2cAddress(leftRangeI2c);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -80,16 +74,9 @@ public class ButtonTest extends BaseOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Left Color", "red: " + leftColorSensor.red() + "blue: " + leftColorSensor.blue());
-            telemetry.addData("Right Color", "red: " + rightColorSensor.red() + "blue: " + rightColorSensor.blue());
 
-            if (leftColorSensor.red() > rightColorSensor.red() && leftColorSensor.blue() < rightColorSensor.blue()) {
-                leftFlapServo.setPosition(leftFlapEndPos);
-                rightFlapServo.setPosition(rightFlapInitPos);
-            } else if (rightColorSensor.red() > leftColorSensor.red() && rightColorSensor.blue() < leftColorSensor.blue()) {
-                rightFlapServo.setPosition(rightFlapEndPos);
-                leftFlapServo.setPosition(leftFlapInitPos);
-            }
+            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
