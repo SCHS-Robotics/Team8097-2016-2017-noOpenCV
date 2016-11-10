@@ -29,7 +29,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     I2cAddr leftColorI2c = I2cAddr.create8bit(0x3c);
     I2cAddr rightColorI2c = I2cAddr.create8bit(0x4c);
     I2cAddr frontTapeI2c = I2cAddr.create8bit(0x5c);
-//    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
+    //    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
     ModernRoboticsI2cRangeSensor leftRangeSensor;
     ModernRoboticsI2cRangeSensor rightRangeSensor;
     I2cAddr rightRangeI2c = I2cAddr.create8bit(0x28);
@@ -50,6 +50,20 @@ public abstract class BaseOpMode extends LinearOpMode {
             data += key + ": " + telemetryData.get(key) + "" + "\n";
         }
         FtcRobotControllerActivity.logData.obtainMessage(0, data).sendToTarget();
+    }
+
+    protected void spinRight(double power) {
+        motorBackLeft.setPower(-power);
+        motorBackRight.setPower(-power);
+        motorFrontLeft.setPower(-power);
+        motorFrontRight.setPower(-power);
+    }
+
+    protected void spinLeft(double power) {
+        motorBackLeft.setPower(power);
+        motorBackRight.setPower(power);
+        motorFrontLeft.setPower(power);
+        motorFrontRight.setPower(power);
     }
 
     public void resetEncoders() {
