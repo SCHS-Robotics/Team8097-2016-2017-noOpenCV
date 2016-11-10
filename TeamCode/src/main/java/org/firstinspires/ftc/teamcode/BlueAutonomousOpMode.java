@@ -74,4 +74,39 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
+
+    @Override
+    public void moveAcrossField(double power) {
+        goDiagonalBackwardLeft(power);
+    }
+
+    @Override
+    public void moveDiagonalOut(double power) {
+        goLeft(power);
+    }
+
+    @Override
+    public void moveDiagonalIn(double power) {
+        goForward(power);
+    }
+
+    @Override
+    public void moveLeftSideForward(double power) {
+        moveBackWheelsLeft(power);
+    }
+
+    @Override
+    public void moveLeftSideBackward(double power) {
+        moveBackWheelsRight(power);
+    }
+
+    @Override
+    public void moveRightSideForward(double power) {
+        moveFrontWheelsLeft(power);
+    }
+
+    @Override
+    public void moveRightSideBackward(double power) {
+        moveFrontWheelsRight(power);
+    }
 }

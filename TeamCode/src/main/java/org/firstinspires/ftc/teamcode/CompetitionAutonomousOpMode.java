@@ -46,4 +46,18 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
             backTapeLowThreshold = 10;
         }
     }
+
+    public abstract void moveAcrossField(double power);
+
+    public abstract void moveDiagonalOut(double power);
+
+    public abstract void moveDiagonalIn(double power);
+
+    public abstract void moveLeftSideForward(double power);
+
+    public abstract void moveLeftSideBackward(double power);
+
+    public abstract void moveRightSideForward(double power);
+
+    public abstract void moveRightSideBackward(double power);
 }
