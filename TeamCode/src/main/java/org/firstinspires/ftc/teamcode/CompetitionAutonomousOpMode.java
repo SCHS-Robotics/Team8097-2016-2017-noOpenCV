@@ -1,13 +1,39 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
+    private ElapsedTime runtime = new ElapsedTime();
+
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        initialize();
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        runtime.reset();
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.update();
+
+            //do stuff
+
+            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+        }
+    }
 
     public void initialize() {
         motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
@@ -47,17 +73,28 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         }
     }
 
+    //These movements are with respect to the field. Different for red and blue because they mirror each other.
     public abstract void moveAcrossField(double power);
 
-    public abstract void moveDiagonalOut(double power);
+    public abstract void moveAlongStartWall(double power);
 
-    public abstract void moveDiagonalIn(double power);
+    public abstract void moveAlongBeaconWall(double power);
 
-    public abstract void moveLeftSideForward(double power);
 
-    public abstract void moveLeftSideBackward(double power);
+    //These movements are with respect to the autonomous side of the robot.
+    public void moveLeftSideForward(double power) {
+        moveBackWheelsLeft(power);
+    }
 
-    public abstract void moveRightSideForward(double power);
+    public void moveLeftSideBackward(double power) {
+        moveBackWheelsRight(power);
+    }
 
-    public abstract void moveRightSideBackward(double power);
+    public void moveRightSideForward(double power) {
+        moveFrontWheelsLeft(power);
+    }
+
+    public void moveRightSideBackward(double power) {
+        moveFrontWheelsRight(power);
+    }
 }
