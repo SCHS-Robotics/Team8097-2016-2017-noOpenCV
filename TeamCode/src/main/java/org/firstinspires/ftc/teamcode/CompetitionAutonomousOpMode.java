@@ -29,7 +29,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            //do stuff
+            goDiagonalForwardRight(DEFAULT_DIAGONAL_POWER);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
@@ -47,9 +47,9 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         leftRangeSensor.setI2cAddress(leftRangeI2c);
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
-        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
         frontTapeSensor.enableLed(true);
-        backTapeSensor.enableLed(true);
+//        backTapeSensor.enableLed(true);
 
         rightColorSensor = hardwareMap.colorSensor.get("rightColor");
         leftColorSensor = hardwareMap.colorSensor.get("leftColor");

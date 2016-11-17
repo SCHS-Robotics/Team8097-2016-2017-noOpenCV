@@ -14,7 +14,9 @@ import java.util.HashMap;
 
 public abstract class BaseOpMode extends LinearOpMode {
 
-    public final static double DEFAULT_POWER = 0.5;
+    public final static double DEFAULT_FORWARD_POWER = 0.5;
+    public final static double DEFAULT_DIAGONAL_POWER = 0.3;
+    public final static double DEFAULT_SIDEWAYS_POWER = 1;
 
     DcMotor motorFrontRight;
     DcMotor motorFrontLeft;
@@ -53,17 +55,17 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     protected void spinRight(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(-power);
-    }
-
-    protected void spinLeft(double power) {
         motorBackLeft.setPower(power);
         motorBackRight.setPower(power);
         motorFrontLeft.setPower(power);
         motorFrontRight.setPower(power);
+    }
+
+    protected void spinLeft(double power) {
+        motorBackLeft.setPower(-power);
+        motorBackRight.setPower(-power);
+        motorFrontLeft.setPower(-power);
+        motorFrontRight.setPower(-power);
     }
 
     public void resetEncoders() {

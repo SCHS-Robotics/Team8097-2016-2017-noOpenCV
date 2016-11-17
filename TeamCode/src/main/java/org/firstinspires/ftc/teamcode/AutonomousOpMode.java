@@ -10,17 +10,17 @@ public abstract class AutonomousOpMode extends BaseOpMode {
     }
 
     public void goForward(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(power);
-    }
-
-    public void goBackward(double power) {
         motorBackLeft.setPower(power);
         motorBackRight.setPower(-power);
         motorFrontLeft.setPower(power);
         motorFrontRight.setPower(-power);
+    }
+
+    public void goBackward(double power) {
+        motorBackLeft.setPower(-power);
+        motorBackRight.setPower(power);
+        motorFrontLeft.setPower(-power);
+        motorFrontRight.setPower(power);
     }
 
     public void goLeft(double power) {
@@ -38,31 +38,31 @@ public abstract class AutonomousOpMode extends BaseOpMode {
     }
 
     public void goDiagonalForwardRight(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(power);
-    }
-
-    public void goDiagonalForwardLeft(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(0);
-    }
-
-    public void goDiagonalBackwardRight(double power) {
         motorBackLeft.setPower(0);
         motorBackRight.setPower(-power);
         motorFrontLeft.setPower(power);
         motorFrontRight.setPower(0);
     }
 
-    public void goDiagonalBackwardLeft(double power) {
+    public void goDiagonalForwardLeft(double power) {
         motorBackLeft.setPower(power);
         motorBackRight.setPower(0);
         motorFrontLeft.setPower(0);
         motorFrontRight.setPower(-power);
+    }
+
+    public void goDiagonalBackwardRight(double power) {
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(power);
+        motorFrontLeft.setPower(-power);
+        motorFrontRight.setPower(0);
+    }
+
+    public void goDiagonalBackwardLeft(double power) {
+        motorBackLeft.setPower(-power);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(power);
     }
 
     public void moveBackWheelsLeft(double power) {
@@ -94,30 +94,30 @@ public abstract class AutonomousOpMode extends BaseOpMode {
     }
 
     public void moveLeftWheelsForward(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(0);
-    }
-
-    public void moveLeftWheelsBackward(double power) {
         motorBackLeft.setPower(power);
         motorBackRight.setPower(0);
         motorFrontLeft.setPower(power);
         motorFrontRight.setPower(0);
     }
 
-    public void moveRightWheelsForward(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(power);
+    public void moveLeftWheelsBackward(double power) {
+        motorBackLeft.setPower(-power);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(-power);
+        motorFrontRight.setPower(0);
     }
 
-    public void moveRightWheelsBackward(double power) {
+    public void moveRightWheelsForward(double power) {
         motorBackLeft.setPower(0);
         motorBackRight.setPower(-power);
         motorFrontLeft.setPower(0);
         motorFrontRight.setPower(-power);
+    }
+
+    public void moveRightWheelsBackward(double power) {
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(power);
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(power);
     }
 }

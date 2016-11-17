@@ -55,6 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class CompetitionTeleOp extends BaseOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime pushButtonTime = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -66,15 +67,22 @@ public class CompetitionTeleOp extends BaseOpMode {
         motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
         motorFrontRight = hardwareMap.dcMotor.get("frontRight");
 
+        rightFlapServo = hardwareMap.servo.get("rightFlap");
+        leftFlapServo = hardwareMap.servo.get("leftFlap");
+        rightFlapServo.setPosition(rightFlapInitPos);
+        leftFlapServo.setPosition(leftFlapInitPos);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        pushButtonTime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
+            //Movement
             if (gamepad1.right_trigger > 0) {
                 spinRight(gamepad1.right_trigger / 3.0);
             } else if (gamepad1.left_trigger > 0) {
@@ -85,14 +93,29 @@ public class CompetitionTeleOp extends BaseOpMode {
                 goDirection(joystickInputX, joystickInputY);
             }
 
+            //Button Pushers
+            if (gamepad1.left_bumper) {
+                pushButtonTime.reset();
+                leftFlapServo.setPosition(leftFlapEndPos);
+                rightFlapServo.setPosition(rightFlapInitPos);
+            } else if (gamepad1.right_bumper) {
+                pushButtonTime.reset();
+                rightFlapServo.setPosition(rightFlapEndPos);
+                leftFlapServo.setPosition(leftFlapInitPos);
+            }
+            if (pushButtonTime.time() >= 0.5) {
+                rightFlapServo.setPosition(rightFlapInitPos);
+                leftFlapServo.setPosition(leftFlapInitPos);
+            }
+
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
 
     protected void goDirection(double x, double y) {
-        motorBackLeft.setPower((-y + x) / 2.0);
-        motorBackRight.setPower((y + x) / 2.0);
-        motorFrontLeft.setPower((-y - x) / 2.0);
-        motorFrontRight.setPower((y - x) / 2.0);
+        motorBackLeft.setPower((y - x) / 2.0);
+        motorBackRight.setPower((-y - x) / 2.0);
+        motorFrontLeft.setPower((y + x) / 2.0);
+        motorFrontRight.setPower((-y + x) / 2.0);
     }
 }
