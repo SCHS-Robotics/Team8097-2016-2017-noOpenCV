@@ -28,28 +28,40 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
+        boolean run = true;
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            while ((getLeftRangeDistance() > closeToWallDistance || getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
-                moveAcrossField(DEFAULT_DIAGONAL_POWER);
+            if (run) {
+                moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 107 * Math.sqrt(2));//TODO measure distance from edge of corner vortex to wall
+                while ((getLeftRangeDistance() > closeToWallDistance || getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
+                    moveAlongStartWall(DEFAULT_SIDEWAYS_POWER);
+                }
+                findTapeInward();
+                pushCorrectButton();
+                moveAlongBeaconWallDistance(DEFAULT_FORWARD_POWER, 5);
+                findTapeInward();
+                pushCorrectButton();
+                run = false;
             }
-            findTapeInward();
-            pushCorrectButton();
-            findTapeInward();
-            pushCorrectButton();
 
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+            idle();
         }
     }
 
     //These movements are with respect to the field. Different for red and blue because they mirror each other.
     public abstract void moveAcrossField(double power);
 
+    public abstract void moveAcrossFieldDistance(double power, double centimeters);
+
     public abstract void moveAlongStartWall(double power);
 
+    public abstract void moveAlongStartWallDistance(double power, double centimeters);
+
     public abstract void moveAlongBeaconWall(double power);
+
+    public abstract void moveAlongBeaconWallDistance(double power, double centimeters);
 
 
     //These movements are with respect to the autonomous side of the robot.

@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
+import org.firstinspires.ftc.robotcontroller.internal.testcode.TestColorSensors;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public abstract class AutonomousOpMode extends BaseOpMode {
@@ -135,7 +139,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         stopRobot();
     }
 
-    public void goBackwardDistance(double power, double centimeters){
+    public void goBackwardDistance(double power, double centimeters) {
         goForwardDistance(-power, centimeters);
     }
 
@@ -197,25 +201,31 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         return leftRangeReader.read(0x04, 1)[0];
     }
 
-    public double getAverageRed(ColorSensor colorSensor) throws InterruptedException {
-        double averageRed = 0;
-        int numReads = 100;
+    public int[] getAverageColor(ColorSensor... colorSensors) throws InterruptedException {
+        int n = colorSensors.length;
+        double[] averageAlpha = new double[n];
+        double[] averageRed = new double[n];
+        double[] averageGreen = new double[n];
+        double[] averageBlue = new double[n];
+        int numReads = 10;
         for (int i = 0; i < numReads; i++) {
-            averageRed += colorSensor.red();
-            sleep(1);
+            for (int j = 0; j < n; j++) {
+                int color = colorSensors[j].argb();
+                averageAlpha[j] += Color.alpha(color);
+                averageRed[j] += Color.red(color);
+                averageGreen[j] += Color.green(color);
+                averageBlue[j] += Color.blue(color);
+            }
+            sleep(34);//"internal sampling rate" is 30 times per second, according to Modern Robotics  (1/30) * 1000 = 33.3
         }
-        averageRed /= numReads;
-        return averageRed;
-    }
-
-    public double getAverageBlue(ColorSensor colorSensor) throws InterruptedException {
-        double averageBlue = 0;
-        int numReads = 100;
-        for (int i = 0; i < numReads; i++) {
-            averageBlue += colorSensor.blue();
-            sleep(1);
+        int[] averageColor = new int[n];
+        for (int j = 0; j < n; j++) {
+            averageAlpha[j] /= numReads;
+            averageRed[j] /= numReads;
+            averageGreen[j] /= numReads;
+            averageBlue[j] /= numReads;
+            averageColor[j] = Color.argb((int) Math.round(averageAlpha[j]), (int) Math.round(averageRed[j]), (int) Math.round(averageGreen[j]), (int) Math.round(averageBlue[j]));
         }
-        averageBlue /= numReads;
-        return averageBlue;
+        return averageColor;
     }
 }

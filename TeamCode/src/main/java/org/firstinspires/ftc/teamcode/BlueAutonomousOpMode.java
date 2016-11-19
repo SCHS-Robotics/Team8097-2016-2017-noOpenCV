@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -58,13 +60,28 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
+    public void moveAcrossFieldDistance(double power, double centimeters) {
+        goDiagonalBackwardLeftDistance(power, centimeters);
+    }
+
+    @Override
     public void moveAlongStartWall(double power) {
         goLeft(power);
     }
 
     @Override
+    public void moveAlongStartWallDistance(double power, double centimeters) {
+        goLeftDistance(power, centimeters);
+    }
+
+    @Override
     public void moveAlongBeaconWall(double power) {
         goForward(power);
+    }
+
+    @Override
+    public void moveAlongBeaconWallDistance(double power, double centimeters) {
+        goForwardDistance(power, centimeters);
     }
 
     @Override
@@ -79,10 +96,13 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
 
     @Override
     public void pushCorrectButton() throws InterruptedException {
-        double leftBlue = getAverageBlue(leftColorSensor);
-        double rightBlue = getAverageBlue(rightColorSensor);
-        double leftRed = getAverageRed(leftColorSensor);
-        double rightRed = getAverageRed(rightColorSensor);
+        int[] colors = getAverageColor(leftColorSensor, rightColorSensor);
+        int leftColor = colors[0];
+        int rightColor = colors[1];
+        double leftBlue = Color.blue(leftColor);
+        double rightBlue = Color.blue(rightColor);
+        double leftRed = Color.red(leftColor);
+        double rightRed = Color.red(rightColor);
         if (leftBlue > rightBlue && leftRed < rightRed) {
             leftFlapServo.setPosition(leftFlapEndPos);
             rightFlapServo.setPosition(rightFlapInitPos);
