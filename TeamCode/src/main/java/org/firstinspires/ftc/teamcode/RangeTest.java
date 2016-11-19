@@ -32,8 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.I2cDevice;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -51,7 +53,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Range Test", group = "OpMode")
+@Autonomous(name = "Range Test", group = "Test")
 public class RangeTest extends BaseOpMode {
 
     /* Declare OpMode members. */
@@ -62,10 +64,17 @@ public class RangeTest extends BaseOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
-        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
-        rightRangeSensor.setI2cAddress(rightRangeI2c);
-        leftRangeSensor.setI2cAddress(leftRangeI2c);
+//        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
+//        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
+//        rightRangeSensor.setI2cAddress(rightRangeI2c);
+//        leftRangeSensor.setI2cAddress(leftRangeI2c);
+
+        rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
+        leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
+        rightRangeReader = new I2cDeviceSynchImpl(rightRangeSensor, rightRangeI2c, false);
+        leftRangeReader = new I2cDeviceSynchImpl(leftRangeSensor, leftRangeI2c, false);
+        rightRangeReader.engage();
+        leftRangeReader.engage();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -75,8 +84,15 @@ public class RangeTest extends BaseOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
-            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+//            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+//            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+
+            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];
+            int leftUltrasonic = leftRangeReader.read(0x04, 1)[0];
+
+            //display values
+            telemetry.addData("Right", rightUltrasonic);
+            telemetry.addData("Left", leftUltrasonic);
 
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

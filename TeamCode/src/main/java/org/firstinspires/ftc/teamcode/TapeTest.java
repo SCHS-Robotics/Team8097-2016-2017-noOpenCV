@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Tape Test", group = "OpMode")
+@Autonomous(name = "Tape Test", group = "Test")
 public class TapeTest extends BaseOpMode {
 
     /* Declare OpMode members. */

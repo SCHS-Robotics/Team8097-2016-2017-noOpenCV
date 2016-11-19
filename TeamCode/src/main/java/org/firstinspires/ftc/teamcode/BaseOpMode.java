@@ -6,9 +6,13 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cDevice;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.HashMap;
 
@@ -17,6 +21,10 @@ public abstract class BaseOpMode extends LinearOpMode {
     public final static double DEFAULT_FORWARD_POWER = 0.5;
     public final static double DEFAULT_DIAGONAL_POWER = 0.3;
     public final static double DEFAULT_SIDEWAYS_POWER = 1;
+
+    public final static double TICKS_PER_CM_FORWARD = 56.243;
+    public final static double TICKS_PER_CM_SIDEWAYS = 68.709;
+    public final static double TICKS_PER_CM_DIAGONAL = 93.294;
 
     DcMotor motorFrontRight;
     DcMotor motorFrontLeft;
@@ -32,15 +40,17 @@ public abstract class BaseOpMode extends LinearOpMode {
     I2cAddr rightColorI2c = I2cAddr.create8bit(0x4c);
     I2cAddr frontTapeI2c = I2cAddr.create8bit(0x5c);
     //    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
-    ModernRoboticsI2cRangeSensor leftRangeSensor;
-    ModernRoboticsI2cRangeSensor rightRangeSensor;
+    I2cDevice leftRangeSensor;
+    I2cDevice rightRangeSensor;
+    I2cDeviceSynch rightRangeReader;
+    I2cDeviceSynch leftRangeReader;
     I2cAddr rightRangeI2c = I2cAddr.create8bit(0x28);
     I2cAddr leftRangeI2c = I2cAddr.create8bit(0x38);
 
-    double leftFlapInitPos = 0.704;
-    double rightFlapInitPos = 0.114;
-    double leftFlapEndPos = 0.466;
-    double rightFlapEndPos = 0.352;
+    double leftFlapInitPos = 0.324;
+    double rightFlapInitPos = 0.780;
+    double leftFlapEndPos = 0.162;
+    double rightFlapEndPos = 0.936;
 
     private HashMap<String, String> telemetryData = new HashMap<String, String>();
 
@@ -83,21 +93,24 @@ public abstract class BaseOpMode extends LinearOpMode {
         motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void allInit() {
+    public void allInit() {
         motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
         motorFrontRight = hardwareMap.dcMotor.get("frontRight");
         motorBackRight = hardwareMap.dcMotor.get("backRight");
         motorBackLeft = hardwareMap.dcMotor.get("backLeft");
 
-        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
-        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
-        rightRangeSensor.setI2cAddress(rightRangeI2c);
-        leftRangeSensor.setI2cAddress(leftRangeI2c);
+        rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
+        leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
+        rightRangeReader = new I2cDeviceSynchImpl(rightRangeSensor, rightRangeI2c, false);
+        leftRangeReader = new I2cDeviceSynchImpl(leftRangeSensor, leftRangeI2c, false);
+        rightRangeReader.engage();
+        leftRangeReader.engage();
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
-        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+        frontTapeSensor.setI2cAddress(frontTapeI2c);
         frontTapeSensor.enableLed(true);
-        backTapeSensor.enableLed(true);
+//        backTapeSensor.enableLed(true);
 
         rightColorSensor = hardwareMap.colorSensor.get("rightColor");
         leftColorSensor = hardwareMap.colorSensor.get("leftColor");

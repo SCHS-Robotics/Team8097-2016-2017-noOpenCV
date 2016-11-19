@@ -13,12 +13,15 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
 
+    final double closeToWallDistance = 8;//centimeters
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        initialize();
+        allInit();
+        loadTapeValues();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -29,47 +32,15 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            goDiagonalForwardRight(DEFAULT_DIAGONAL_POWER);
+            while ((getLeftRangeDistance() > closeToWallDistance || getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
+                moveAcrossField(DEFAULT_DIAGONAL_POWER);
+            }
+            findTapeInward();
+            pushCorrectButton();
+            findTapeInward();
+            pushCorrectButton();
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-        }
-    }
-
-    public void initialize() {
-        motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
-        motorFrontRight = hardwareMap.dcMotor.get("frontRight");
-        motorBackRight = hardwareMap.dcMotor.get("backRight");
-        motorBackLeft = hardwareMap.dcMotor.get("backLeft");
-
-        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
-        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
-        rightRangeSensor.setI2cAddress(rightRangeI2c);
-        leftRangeSensor.setI2cAddress(leftRangeI2c);
-
-        frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
-//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
-        frontTapeSensor.enableLed(true);
-//        backTapeSensor.enableLed(true);
-
-        rightColorSensor = hardwareMap.colorSensor.get("rightColor");
-        leftColorSensor = hardwareMap.colorSensor.get("leftColor");
-        rightColorSensor.setI2cAddress(rightColorI2c);
-        leftColorSensor.setI2cAddress(leftColorI2c);
-        rightColorSensor.enableLed(false);
-        leftColorSensor.enableLed(false);
-
-        rightFlapServo = hardwareMap.servo.get("rightFlap");
-        leftFlapServo = hardwareMap.servo.get("leftFlap");
-        rightFlapServo.setPosition(rightFlapInitPos);
-        leftFlapServo.setPosition(leftFlapInitPos);
-
-        frontTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -2) + FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -2)) / 2.0;
-        if (frontTapeLowThreshold < 0) {
-            frontTapeLowThreshold = 10;
-        }
-        backTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("backTapeValue", -2) + FtcRobotControllerActivity.calibrationSP.getFloat("backGroundValue", -2)) / 2.0;
-        if (backTapeLowThreshold < 0) {
-            backTapeLowThreshold = 10;
         }
     }
 
@@ -96,5 +67,40 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     public void moveRightSideBackward(double power) {
         moveFrontWheelsRight(power);
+    }
+
+    public void findTapeRight() {
+        while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
+            telemetry.addData("light", frontTapeSensor.alpha());
+            telemetry.update();
+            goForward(DEFAULT_FORWARD_POWER);
+        }
+        stopRobot();
+    }
+
+    public void findTapeLeft() {
+        while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
+            telemetry.addData("light", frontTapeSensor.alpha());
+            telemetry.update();
+            goBackward(DEFAULT_FORWARD_POWER);
+        }
+        stopRobot();
+    }
+
+    public abstract void findTapeInward();
+
+    public abstract void findTapeOutward();
+
+    public abstract void pushCorrectButton() throws InterruptedException;
+
+    public void loadTapeValues() {
+        frontTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -1000)) / 2.0;
+        if (frontTapeLowThreshold < 0) {
+            frontTapeLowThreshold = 3;
+        }
+        backTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("backTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("backGroundValue", -1000)) / 2.0;
+        if (backTapeLowThreshold < 0) {
+            backTapeLowThreshold = 3;
+        }
     }
 }

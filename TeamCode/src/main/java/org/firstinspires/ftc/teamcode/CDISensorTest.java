@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@Autonomous(name = "CDI Sensor Test", group = "OpMode")
+@Autonomous(name = "CDI Sensor Test", group = "Test")
 public class CDISensorTest extends OpMode {//CDI stands for Core Device Interface
     //    private OpticalDistanceSensor ods;
 //    private LightSensor lightSensor;

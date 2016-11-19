@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
-@TeleOp(name = "Calibrate", group = "Util")
-public class CalibrateOpMode extends BaseOpMode {
+@TeleOp(name = "Calibrate Tape", group = "Util")
+public class CalibrateTape extends BaseOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 

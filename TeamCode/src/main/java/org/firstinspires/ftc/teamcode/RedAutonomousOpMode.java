@@ -41,10 +41,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p/>
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p/>
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
@@ -65,5 +65,33 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
     @Override
     public void moveAlongBeaconWall(double power) {
         goBackward(power);
+    }
+
+    @Override
+    public void findTapeInward() {
+        findTapeRight();
+    }
+
+    @Override
+    public void findTapeOutward() {
+        findTapeLeft();
+    }
+
+    @Override
+    public void pushCorrectButton() throws InterruptedException {
+        double leftRed = getAverageRed(leftColorSensor);
+        double rightRed = getAverageRed(rightColorSensor);
+        double leftBlue = getAverageBlue(leftColorSensor);
+        double rightBlue = getAverageBlue(rightColorSensor);
+        if (leftRed > rightRed && leftBlue < rightBlue) {
+            leftFlapServo.setPosition(leftFlapEndPos);
+            rightFlapServo.setPosition(rightFlapInitPos);
+        } else if (rightRed > leftRed && rightBlue < leftBlue) {
+            rightFlapServo.setPosition(rightFlapEndPos);
+            leftFlapServo.setPosition(leftFlapInitPos);
+        }
+        sleep(500);
+        rightFlapServo.setPosition(rightFlapInitPos);
+        leftFlapServo.setPosition(leftFlapInitPos);
     }
 }

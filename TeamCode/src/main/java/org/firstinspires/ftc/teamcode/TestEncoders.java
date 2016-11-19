@@ -33,6 +33,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -41,57 +43,52 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p/>
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p/>
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Blue Autonomous", group = "OpMode")
-public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
+@Autonomous(name = "Test Encoders", group = "Test")
+public class TestEncoders extends AutonomousOpMode {
+
+    /* Declare OpMode members. */
+    private ElapsedTime runtime = new ElapsedTime();
+    // DcMotor leftMotor = null;
+    // DcMotor rightMotor = null;
 
     @Override
-    public void moveAcrossField(double power) {
-        goDiagonalBackwardLeft(power);
-    }
+    public void runOpMode() throws InterruptedException {
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
-    @Override
-    public void moveAlongStartWall(double power) {
-        goLeft(power);
-    }
+        allInit();
 
-    @Override
-    public void moveAlongBeaconWall(double power) {
-        goForward(power);
-    }
+        waitForStart();
+        runtime.reset();
+        resetEncoders();
 
-    @Override
-    public void findTapeInward() {
-        findTapeLeft();
-    }
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.update();
 
-    @Override
-    public void findTapeOutward() {
-        findTapeRight();
-    }
+//            goForward(DEFAULT_FORWARD_POWER);
+            telemetry.addData("backLeft", motorBackLeft.getCurrentPosition());
+            telemetry.addData("backRight", motorBackRight.getCurrentPosition());
+            telemetry.addData("frontLeft", motorFrontLeft.getCurrentPosition());
+            telemetry.addData("frontRight", motorFrontRight.getCurrentPosition());
+            goDiagonalForwardRightDistance(DEFAULT_DIAGONAL_POWER, 10);
+            stopRobot();
+            sleep(500000);
 
-    @Override
-    public void pushCorrectButton() throws InterruptedException {
-        double leftBlue = getAverageBlue(leftColorSensor);
-        double rightBlue = getAverageBlue(rightColorSensor);
-        double leftRed = getAverageRed(leftColorSensor);
-        double rightRed = getAverageRed(rightColorSensor);
-        if (leftBlue > rightBlue && leftRed < rightRed) {
-            leftFlapServo.setPosition(leftFlapEndPos);
-            rightFlapServo.setPosition(rightFlapInitPos);
-        } else if (rightBlue > leftBlue && rightRed < leftRed) {
-            rightFlapServo.setPosition(rightFlapEndPos);
-            leftFlapServo.setPosition(leftFlapInitPos);
+            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+            // leftMotor.setPower(-gamepad1.left_stick_y);
+            // rightMotor.setPower(-gamepad1.right_stick_y);
+
+            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
-        sleep(500);
-        rightFlapServo.setPosition(rightFlapInitPos);
-        leftFlapServo.setPosition(leftFlapInitPos);
     }
 }
