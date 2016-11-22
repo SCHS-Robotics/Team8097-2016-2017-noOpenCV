@@ -32,14 +32,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.I2cDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -54,61 +50,79 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Range Test", group = "Test")
-public class RangeTest extends BaseOpMode {
-
-    RangeSensor leftRangeSensorTest;
-    RangeSensor rightRangeSensorTest;
+@TeleOp(name = "Calibrate Launcher", group = "Util")
+public class TestLauncher extends BaseOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime launcherTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+    DcMotor leftLaunchMotor;
+    DcMotor rightLaunchMotor;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-//        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
-//        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
-//        rightRangeSensor.setI2cAddress(rightRangeI2c);
-//        leftRangeSensor.setI2cAddress(leftRangeI2c);
+        leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
+        rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
 
-        rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
-        leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
-        rightRangeReader = new I2cDeviceSynchImpl(rightRangeSensor, rightRangeI2c, true);
-        leftRangeReader = new I2cDeviceSynchImpl(leftRangeSensor, leftRangeI2c, true);
-
-        leftRangeSensorTest = new RangeSensor(leftRangeReader);
-        rightRangeSensorTest = new RangeSensor(rightRangeReader);
-
-//        rightRangeReader.engage();
-//        leftRangeReader.engage();
-
-        // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        ModernRoboticsI2cRangeSensor m;
-
+        launcherTime.reset();
+        resetEncoders(rightLaunchMotor, leftLaunchMotor);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.update();
 
-//            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
-//            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+            launchMotorsRpm(1500);
+            sleep(60000);
 
-//            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];
-//            int leftUltrasonic = leftRangeReader.read(0x04, 1)[0];
+            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+            // leftMotor.setPower(-gamepad1.left_stick_y);
+            // rightMotor.setPower(-gamepad1.right_stick_y);
 
-            int rightUltrasonic = rightRangeSensorTest.rawUltrasonic();
-            int leftUltrasonic = leftRangeSensorTest.rawUltrasonic();
+            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+        }
+    }
 
-            //display values
-            telemetry.addData("Right", rightUltrasonic);
-            telemetry.addData("Left", leftUltrasonic);
+    public void launchMotorsRpm(double rpm) throws InterruptedException {
+        final int waitTime = 250;
+        double leftPercentError = 0;
+        double rightPercentError = 0;
+//        resetEncoders(leftLaunchMotor, rightLaunchMotor);
+        int leftStartPos = 0;
+        int rightStartPos = 0;
+        leftLaunchMotor.setPower(-0.5);
+        rightLaunchMotor.setPower(0.5);
+        sleep(waitTime);
+        while ((Math.abs(1 - leftPercentError) > 0.015 || (Math.abs(1 - rightPercentError) > 0.015)) && opModeIsActive()) {
+            launcherTime.reset();
+
+            double currentLeftRpm = ((Math.abs(leftLaunchMotor.getCurrentPosition()) - leftStartPos) / 112.0) / (waitTime / 60000.0);
+            leftPercentError = currentLeftRpm / rpm;
+            telemetry.addData("left encoder", Math.abs(leftLaunchMotor.getCurrentPosition()) - leftStartPos);
+            telemetry.addData("leftPercentError", leftPercentError);
+            leftStartPos = Math.abs(leftLaunchMotor.getCurrentPosition());
+            leftLaunchMotor.setPower(-(Math.abs(leftLaunchMotor.getPower()) / leftPercentError));
+            telemetry.addData("left power", leftLaunchMotor.getPower());
+
+            double currentRightRpm = ((Math.abs(rightLaunchMotor.getCurrentPosition()) - rightStartPos) / 112.0) / (waitTime / 60000.0);
+            rightPercentError = currentRightRpm / rpm;
+            telemetry.addData("right encoder", Math.abs(rightLaunchMotor.getCurrentPosition()) - rightStartPos);
+            telemetry.addData("rightPercentError", rightPercentError);
+            rightStartPos = Math.abs(rightLaunchMotor.getCurrentPosition());
+            rightLaunchMotor.setPower((Math.abs(rightLaunchMotor.getPower()) / rightPercentError));
+            telemetry.addData("right power", rightLaunchMotor.getPower());
 
             telemetry.update();
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+
+            if (waitTime - launcherTime.time() > 0) {
+                sleep((int) (waitTime - launcherTime.time()));
+            }
         }
     }
 }

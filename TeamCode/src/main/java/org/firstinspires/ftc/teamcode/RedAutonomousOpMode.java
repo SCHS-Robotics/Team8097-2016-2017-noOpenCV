@@ -65,16 +65,6 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void moveAlongStartWall(double power) {
-        goLeft(power);
-    }
-
-    @Override
-    public void moveAlongStartWallDistance(double power, double centimeters) {
-        goLeftDistance(power, centimeters);
-    }
-
-    @Override
     public void moveAlongBeaconWall(double power) {
         goBackward(power);
     }
@@ -96,8 +86,9 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
 
     @Override
     public void pushCorrectButton() throws InterruptedException {
-        int leftColor = getAverageColor(leftColorSensor);
-        int rightColor = getAverageColor(rightColorSensor);
+        int[] colors = getAverageColor(leftColorSensor, rightColorSensor);
+        int leftColor = colors[0];
+        int rightColor = colors[1];
         double leftRed = Color.red(leftColor);
         double rightRed = Color.red(rightColor);
         double leftBlue = Color.blue(leftColor);

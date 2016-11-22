@@ -33,9 +33,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -56,8 +53,6 @@ public class TestEncoders extends AutonomousOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    // DcMotor leftMotor = null;
-    // DcMotor rightMotor = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -68,7 +63,7 @@ public class TestEncoders extends AutonomousOpMode {
 
         waitForStart();
         runtime.reset();
-        resetEncoders();
+        resetWheelEncoders();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -76,11 +71,11 @@ public class TestEncoders extends AutonomousOpMode {
             telemetry.update();
 
 //            goForward(DEFAULT_FORWARD_POWER);
-            telemetry.addData("backLeft", motorBackLeft.getCurrentPosition());
-            telemetry.addData("backRight", motorBackRight.getCurrentPosition());
-            telemetry.addData("frontLeft", motorFrontLeft.getCurrentPosition());
-            telemetry.addData("frontRight", motorFrontRight.getCurrentPosition());
-            goDiagonalForwardRightDistance(DEFAULT_DIAGONAL_POWER, 10);
+            telemetry.addData("backLeft", backLeftMotor.getCurrentPosition());
+            telemetry.addData("backRight", backRightMotor.getCurrentPosition());
+            telemetry.addData("frontLeft", frontLeftMotor.getCurrentPosition());
+            telemetry.addData("frontRight", frontRightMotor.getCurrentPosition());
+            goRightDistance(DEFAULT_SIDEWAYS_POWER, 1);
             stopRobot();
             sleep(500000);
 

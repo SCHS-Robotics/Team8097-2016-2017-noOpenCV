@@ -65,16 +65,6 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void moveAlongStartWall(double power) {
-        goLeft(power);
-    }
-
-    @Override
-    public void moveAlongStartWallDistance(double power, double centimeters) {
-        goLeftDistance(power, centimeters);
-    }
-
-    @Override
     public void moveAlongBeaconWall(double power) {
         goForward(power);
     }

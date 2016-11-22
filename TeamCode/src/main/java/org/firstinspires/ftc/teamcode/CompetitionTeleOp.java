@@ -31,9 +31,7 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -62,10 +60,10 @@ public class CompetitionTeleOp extends BaseOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        motorBackLeft = hardwareMap.dcMotor.get("backLeft");
-        motorBackRight = hardwareMap.dcMotor.get("backRight");
-        motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
-        motorFrontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeftMotor = hardwareMap.dcMotor.get("backLeft");
+        backRightMotor = hardwareMap.dcMotor.get("backRight");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
+        frontRightMotor = hardwareMap.dcMotor.get("frontRight");
 
         rightFlapServo = hardwareMap.servo.get("rightFlap");
         leftFlapServo = hardwareMap.servo.get("leftFlap");
@@ -84,9 +82,9 @@ public class CompetitionTeleOp extends BaseOpMode {
 
             //Movement
             if (gamepad1.right_trigger > 0) {
-                spinRight(gamepad1.right_trigger / 3.0);
+                spinRight(gamepad1.right_trigger / 2.0);
             } else if (gamepad1.left_trigger > 0) {
-                spinLeft(gamepad1.left_trigger / 3.0);
+                spinLeft(gamepad1.left_trigger / 2.0);
             } else {
                 double joystickInputY = -gamepad1.left_stick_y;
                 double joystickInputX = gamepad1.left_stick_x;
@@ -113,9 +111,9 @@ public class CompetitionTeleOp extends BaseOpMode {
     }
 
     protected void goDirection(double x, double y) {
-        motorBackLeft.setPower((y - x) / 2.0);
-        motorBackRight.setPower((-y - x) / 2.0);
-        motorFrontLeft.setPower((y + x) / 2.0);
-        motorFrontRight.setPower((-y + x) / 2.0);
+        backLeftMotor.setPower((y - x) / 1.0);
+        backRightMotor.setPower((-y - x) / 1.0);
+        frontLeftMotor.setPower((y + x) / 1.0);
+        frontRightMotor.setPower((-y + x) / 1.0);
     }
 }

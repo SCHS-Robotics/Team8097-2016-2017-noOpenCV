@@ -2,203 +2,214 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-
-import org.firstinspires.ftc.robotcontroller.internal.testcode.TestColorSensors;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.util.TypeConversion;
 
 public abstract class AutonomousOpMode extends BaseOpMode {
 
     public void stopRobot() {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
     }
 
     public void goForward(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(-power);
     }
 
     public void goBackward(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(power);
     }
 
     public void goLeft(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
     }
 
     public void goRight(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
     }
 
     public void goDiagonalForwardRight(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(0);
     }
 
     public void goDiagonalForwardLeft(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(-power);
     }
 
     public void goDiagonalBackwardRight(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(power);
     }
 
     public void goDiagonalBackwardLeft(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(0);
     }
 
     public void moveBackWheelsLeft(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
     }
 
     public void moveBackWheelsRight(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
     }
 
     public void moveFrontWheelsLeft(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
     }
 
     public void moveFrontWheelsRight(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
     }
 
     public void moveLeftWheelsForward(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(0);
     }
 
     public void moveLeftWheelsBackward(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(0);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(0);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(0);
     }
 
     public void moveRightWheelsForward(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(-power);
     }
 
     public void moveRightWheelsBackward(double power) {
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(power);
     }
 
-    public void goForwardDistance(double power, double centimeters) {
-        resetEncoders();
+    public void goForwardDistance(double power, double centimeters) throws InterruptedException {
+        resetWheelEncoders();
+        fixRpmTimer.reset();
+        goForward(power);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_FORWARD;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            goForward(power);
+            fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
         }
         stopRobot();
     }
 
-    public void goBackwardDistance(double power, double centimeters) {
+    public void goBackwardDistance(double power, double centimeters) throws InterruptedException {
         goForwardDistance(-power, centimeters);
     }
 
-    public void goRightDistance(double power, double centimeters) {
-        resetEncoders();
+    public void goRightDistance(double power, double centimeters) throws InterruptedException {
+        resetWheelEncoders();
+        fixRpmTimer.reset();
+        goRight(power);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_SIDEWAYS;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            goRight(power);
+            fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            logData("backLeft", String.valueOf(backLeftMotor.getCurrentPosition()));
+            logData("backRight", String.valueOf(backRightMotor.getCurrentPosition()));
+            logData("frontLeft", String.valueOf(frontLeftMotor.getCurrentPosition()));
+            logData("frontRight", String.valueOf(frontRightMotor.getCurrentPosition()));
+            telemetry.update();
         }
         stopRobot();
     }
 
-    public void goLeftDistance(double power, double centimeters) {
+    public void goLeftDistance(double power, double centimeters) throws InterruptedException {
         goRightDistance(-power, centimeters);
     }
 
-    private void goDiagonalDistance(double power, double centimeters, int forward, int sideways) {
-        resetEncoders();
+    private void goDiagonalDistance(double power, double centimeters, int forward, int sideways) throws InterruptedException {
+        resetWheelEncoders();
+        fixRpmTimer.reset();
+        if (forward == 1 && sideways == 1) {
+            goDiagonalForwardRight(power);
+        } else if (forward == 1 && sideways == -1) {
+            goDiagonalForwardLeft(power);
+        } else if (forward == -1 && sideways == 1) {
+            goDiagonalBackwardRight(power);
+        } else if (forward == -1 && sideways == -1) {
+            goDiagonalBackwardLeft(power);
+        }
         double totalEncoderTicks = centimeters * TICKS_PER_CM_DIAGONAL;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            if (forward == 1 && sideways == 1) {
-                goDiagonalForwardRight(power);
-            } else if (forward == 1 && sideways == -1) {
-                goDiagonalForwardLeft(power);
-            } else if (forward == -1 && sideways == 1) {
-                goDiagonalBackwardRight(power);
-            } else if (forward == -1 && sideways == -1) {
-                goDiagonalBackwardLeft(power);
+            if ((forward == 1 && sideways == 1) || (forward == -1 && sideways == -1)) {
+                fixRpm(Math.abs(power) * wheelMaxRpm, backRightMotor, frontLeftMotor);
+            } else if ((forward == 1 && sideways == -1) || (forward == -1 && sideways == 1)) {
+                fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, frontRightMotor);
             }
         }
         stopRobot();
     }
 
-    public void goDiagonalForwardRightDistance(double power, double centimeters) {
+    public void goDiagonalForwardRightDistance(double power, double centimeters) throws InterruptedException {
         goDiagonalDistance(power, centimeters, 1, 1);
     }
 
-    public void goDiagonalForwardLeftDistance(double power, double centimeters) {
+    public void goDiagonalForwardLeftDistance(double power, double centimeters) throws InterruptedException {
         goDiagonalDistance(power, centimeters, 1, -1);
     }
 
-    public void goDiagonalBackwardRightDistance(double power, double centimeters) {
+    public void goDiagonalBackwardRightDistance(double power, double centimeters) throws InterruptedException {
         goDiagonalDistance(power, centimeters, -1, 1);
     }
 
-    public void goDiagonalBackwardLeftDistance(double power, double centimeters) {
+    public void goDiagonalBackwardLeftDistance(double power, double centimeters) throws InterruptedException {
         goDiagonalDistance(power, centimeters, -1, -1);
     }
 
     public int getFurthestEncoder() {
-        return Math.max(Math.max(Math.abs(motorBackLeft.getCurrentPosition()), Math.abs(motorBackRight.getCurrentPosition())), Math.max(Math.abs(motorFrontLeft.getCurrentPosition()), Math.abs(motorFrontRight.getCurrentPosition())));
+        return Math.max(Math.max(Math.abs(backLeftMotor.getCurrentPosition()), Math.abs(backRightMotor.getCurrentPosition())), Math.max(Math.abs(frontLeftMotor.getCurrentPosition()), Math.abs(frontRightMotor.getCurrentPosition())));
     }
 
     public int getRightRangeDistance() {
-        return rightRangeReader.read(0x04, 1)[0];
+        return TypeConversion.unsignedByteToInt(rightRangeReader.read8(0x04));
     }
 
     public int getLeftRangeDistance() {
-        return leftRangeReader.read(0x04, 1)[0];
+        return TypeConversion.unsignedByteToInt(leftRangeReader.read8(0x04));
     }
 
     public int[] getAverageColor(ColorSensor... colorSensors) throws InterruptedException {

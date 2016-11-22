@@ -1,35 +1,54 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public abstract class BaseOpMode extends LinearOpMode {
 
     public final static double DEFAULT_FORWARD_POWER = 0.5;
-    public final static double DEFAULT_DIAGONAL_POWER = 0.3;
+    public final static double DEFAULT_DIAGONAL_POWER = 0.5;
     public final static double DEFAULT_SIDEWAYS_POWER = 1;
 
-    public final static double TICKS_PER_CM_FORWARD = 56.243;
-    public final static double TICKS_PER_CM_SIDEWAYS = 68.709;
-    public final static double TICKS_PER_CM_DIAGONAL = 93.294;
+    public final static double TICKS_PER_CM_FORWARD = 53.565;
+    public final static double TICKS_PER_CM_SIDEWAYS = 70.304;
+    public final static double TICKS_PER_CM_DIAGONAL = 88.348;
 
-    DcMotor motorFrontRight;
-    DcMotor motorFrontLeft;
-    DcMotor motorBackRight;
-    DcMotor motorBackLeft;
+    DcMotor backLeftMotor;
+    DcMotor backRightMotor;
+    DcMotor frontLeftMotor;
+    DcMotor frontRightMotor;
+    DcMotor leftLaunchMotor;
+    DcMotor rightLaunchMotor;
+    HashMap<DcMotor, Integer> encoderStartPos = new HashMap<DcMotor, Integer>() {{
+        put(backLeftMotor, 0);
+        put(backRightMotor, 0);
+        put(frontLeftMotor, 0);
+        put(frontRightMotor, 0);
+        put(leftLaunchMotor, 0);
+        put(rightLaunchMotor, 0);
+    }};
+    HashMap<DcMotor, Integer> pulsesPerRevolution = new HashMap<DcMotor, Integer>() {{
+        put(backLeftMotor, 420);
+        put(backRightMotor, 420);
+        put(frontLeftMotor, 420);
+        put(frontRightMotor, 420);
+        put(leftLaunchMotor, 112);
+        put(rightLaunchMotor, 112);
+    }};
+    int wheelMaxRpm = 105;//TODO test for experimental max
+    int launcherMaxRpm = 1500;//theoretical 1650
     Servo rightFlapServo;
     Servo leftFlapServo;
     ColorSensor rightColorSensor;
@@ -52,9 +71,11 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapEndPos = 0.162;
     double rightFlapEndPos = 0.936;
 
-    private HashMap<String, String> telemetryData = new HashMap<String, String>();
+    ElapsedTime fixRpmTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
-    protected void logData(String label, String value) {
+    private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
+
+    protected void logData(String label, Object value) {
         telemetry.addData(label, value);
         telemetryData.put(label, value);
         String data = "";
@@ -65,39 +86,73 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     protected void spinRight(double power) {
-        motorBackLeft.setPower(power);
-        motorBackRight.setPower(power);
-        motorFrontLeft.setPower(power);
-        motorFrontRight.setPower(power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
     }
 
     protected void spinLeft(double power) {
-        motorBackLeft.setPower(-power);
-        motorBackRight.setPower(-power);
-        motorFrontLeft.setPower(-power);
-        motorFrontRight.setPower(-power);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
     }
 
-    public void resetEncoders() {
-        while (motorFrontRight.getCurrentPosition() != 0)
-            motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        while (motorBackRight.getCurrentPosition() != 0)
-            motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        while (motorFrontLeft.getCurrentPosition() != 0)
-            motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        while (motorBackLeft.getCurrentPosition() != 0)
-            motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void resetWheelEncoders() {
+        resetEncoders(backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+    }
+
+    public void resetLauncherEncoders() {
+        resetEncoders(leftLaunchMotor, rightLaunchMotor);
+    }
+
+    public void resetEncoders(DcMotor... motors) {
+        for (DcMotor motor : motors) {
+            while (motor.getCurrentPosition() != 0)
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            encoderStartPos.put(motor, 0);
+        }
+        for (DcMotor motor : motors) {
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+
+    public double[] fixRpm(double rpm, DcMotor... motors) throws InterruptedException {
+        final int waitTime = 250;
+        double[] percentErrors = new double[motors.length];
+        Arrays.fill(percentErrors, -2);
+        if (fixRpmTimer.time() >= waitTime) {
+            fixRpmTimer.reset();
+            for (int i = 0; i < motors.length; i++) {
+                DcMotor motor = motors[i];
+                int direction = (int) Math.signum(motor.getPower());
+                double currentRpm = ((Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / pulsesPerRevolution.get(motor)) / (waitTime / 60000.0);
+                percentErrors[i] = (currentRpm - rpm) / rpm;
+                encoderStartPos.put(motor, Math.abs(motor.getCurrentPosition()));
+                motor.setPower(direction * (Math.abs(motor.getPower()) / (percentErrors[i] + 1)));
+            }
+        }
+        return percentErrors;
+    }
+
+    public void startLauncher(double rpm) throws InterruptedException {
+        resetLauncherEncoders();
+        fixRpmTimer.reset();
+        leftLaunchMotor.setPower(rpm / launcherMaxRpm);
+        rightLaunchMotor.setPower(rpm / launcherMaxRpm);
+        boolean done = false;
+        while (!done) {
+            double[] percentErrors = fixRpm(rpm, leftLaunchMotor, rightLaunchMotor);
+            done = Math.abs(percentErrors[0]) <= 0.15 && Math.abs(percentErrors[1]) <= 0.15;
+        }
     }
 
     public void allInit() {
-        motorFrontLeft = hardwareMap.dcMotor.get("frontLeft");
-        motorFrontRight = hardwareMap.dcMotor.get("frontRight");
-        motorBackRight = hardwareMap.dcMotor.get("backRight");
-        motorBackLeft = hardwareMap.dcMotor.get("backLeft");
+        backLeftMotor = hardwareMap.dcMotor.get("backLeft");
+        backRightMotor = hardwareMap.dcMotor.get("backRight");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
+        frontRightMotor = hardwareMap.dcMotor.get("frontRight");
 
         rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
         leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
