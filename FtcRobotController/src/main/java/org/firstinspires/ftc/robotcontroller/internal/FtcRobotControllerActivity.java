@@ -594,5 +594,10 @@ public class FtcRobotControllerActivity extends Activity {
         public void handleMessage(Message msg) {
             textDataLog.setText((String) msg.obj);
         }
+//        @Override
+//        public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
+//            textDataLog.setText((String) msg.obj);
+//            return true;
+//        }
     };
 }

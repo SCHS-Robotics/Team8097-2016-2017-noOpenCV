@@ -205,11 +205,11 @@ public abstract class AutonomousOpMode extends BaseOpMode {
     }
 
     public int getRightRangeDistance() {
-        return TypeConversion.unsignedByteToInt(rightRangeReader.read8(0x04));
+        return rightRangeSensor.rawUltrasonic();
     }
 
     public int getLeftRangeDistance() {
-        return TypeConversion.unsignedByteToInt(leftRangeReader.read8(0x04));
+        return leftRangeSensor.rawUltrasonic();
     }
 
     public int[] getAverageColor(ColorSensor... colorSensors) throws InterruptedException {

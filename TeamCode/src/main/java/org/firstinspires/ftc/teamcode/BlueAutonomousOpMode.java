@@ -60,7 +60,7 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void moveAcrossFieldDistance(double power, double centimeters) {
+    public void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException {
         goDiagonalBackwardLeftDistance(power, centimeters);
     }
 
@@ -70,7 +70,7 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void moveAlongBeaconWallDistance(double power, double centimeters) {
+    public void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException {
         goForwardDistance(power, centimeters);
     }
 

@@ -59,12 +59,10 @@ public abstract class BaseOpMode extends LinearOpMode {
     I2cAddr rightColorI2c = I2cAddr.create8bit(0x4c);
     I2cAddr frontTapeI2c = I2cAddr.create8bit(0x5c);
     //    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
-    I2cDevice leftRangeSensor;
-    I2cDevice rightRangeSensor;
-    I2cDeviceSynch rightRangeReader;
-    I2cDeviceSynch leftRangeReader;
-    I2cAddr rightRangeI2c = I2cAddr.create8bit(0x28);
-    I2cAddr leftRangeI2c = I2cAddr.create8bit(0x38);
+    RangeSensor leftRangeSensor;
+    RangeSensor rightRangeSensor;
+    I2cAddr leftRangeI2c = I2cAddr.create8bit(0x28);
+    I2cAddr rightRangeI2c = I2cAddr.create8bit(0x38);
 
     double leftFlapInitPos = 0.324;
     double rightFlapInitPos = 0.780;
@@ -82,6 +80,7 @@ public abstract class BaseOpMode extends LinearOpMode {
         for (String key : telemetryData.keySet()) {
             data += key + ": " + telemetryData.get(key) + "" + "\n";
         }
+        FtcRobotControllerActivity.logData.removeMessages(0);
         FtcRobotControllerActivity.logData.obtainMessage(0, data).sendToTarget();
     }
 
@@ -154,12 +153,12 @@ public abstract class BaseOpMode extends LinearOpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
         frontRightMotor = hardwareMap.dcMotor.get("frontRight");
 
-        rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
-        leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
-        rightRangeReader = new I2cDeviceSynchImpl(rightRangeSensor, rightRangeI2c, false);
-        leftRangeReader = new I2cDeviceSynchImpl(leftRangeSensor, leftRangeI2c, false);
-        rightRangeReader.engage();
-        leftRangeReader.engage();
+        I2cDevice rightRangeDevice = hardwareMap.i2cDevice.get("rightRange");
+        I2cDevice leftRangeDevice = hardwareMap.i2cDevice.get("leftRange");
+        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, rightRangeI2c, false);
+        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, leftRangeI2c, false);
+        leftRangeSensor = new RangeSensor(leftRangeReader);
+        rightRangeSensor = new RangeSensor(rightRangeReader);
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
 //        backTapeSensor = hardwareMap.colorSensor.get("backTape");

@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -57,11 +58,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Autonomous(name = "Range Test", group = "Test")
 public class RangeTest extends BaseOpMode {
 
-    RangeSensor leftRangeSensorTest;
-    RangeSensor rightRangeSensorTest;
-
     /* Declare OpMode members. */
-    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,41 +71,38 @@ public class RangeTest extends BaseOpMode {
 //        rightRangeSensor.setI2cAddress(rightRangeI2c);
 //        leftRangeSensor.setI2cAddress(leftRangeI2c);
 
-        rightRangeSensor = hardwareMap.i2cDevice.get("rightRange");
-        leftRangeSensor = hardwareMap.i2cDevice.get("leftRange");
-        rightRangeReader = new I2cDeviceSynchImpl(rightRangeSensor, rightRangeI2c, true);
-        leftRangeReader = new I2cDeviceSynchImpl(leftRangeSensor, leftRangeI2c, true);
-
-        leftRangeSensorTest = new RangeSensor(leftRangeReader);
-        rightRangeSensorTest = new RangeSensor(rightRangeReader);
+        I2cDevice rightRangeDevice = hardwareMap.i2cDevice.get("rightRange");
+        I2cDevice leftRangeDevice = hardwareMap.i2cDevice.get("leftRange");
+        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, rightRangeI2c, false);
+        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, leftRangeI2c, false);
+        leftRangeSensor = new RangeSensor(leftRangeReader);
+        rightRangeSensor = new RangeSensor(rightRangeReader);
 
 //        rightRangeReader.engage();
 //        leftRangeReader.engage();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
-        ModernRoboticsI2cRangeSensor m;
-
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-
+            runtime.reset();
 //            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 //            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 
 //            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];
 //            int leftUltrasonic = leftRangeReader.read(0x04, 1)[0];
 
-            int rightUltrasonic = rightRangeSensorTest.rawUltrasonic();
-            int leftUltrasonic = leftRangeSensorTest.rawUltrasonic();
+            int rightUltrasonic = rightRangeSensor.rawUltrasonic();
+            int leftUltrasonic = leftRangeSensor.rawUltrasonic();
 
             //display values
-            telemetry.addData("Right", rightUltrasonic);
-            telemetry.addData("Left", leftUltrasonic);
-
+            logData("Right", rightUltrasonic);
+            logData("Left", leftUltrasonic);
             telemetry.update();
+
+//            sleep((int) (50 - runtime.time()));
+
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }

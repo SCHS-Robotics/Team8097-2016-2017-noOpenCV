@@ -36,45 +36,21 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
             telemetry.update();
 
             if (run) {
-//                moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 95 * Math.sqrt(2));//TODO measure distance from edge of corner vortex to wall
-                while ((getLeftRangeDistance() > closeToWallDistance && getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
+                moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 95 * Math.sqrt(2));
+                while ((getLeftRangeDistance() > closeToWallDistance/* || getRightRangeDistance() > closeToWallDistance*/) && opModeIsActive()) {
                     moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
                     telemetry.addData("left", getLeftRangeDistance());
                     telemetry.addData("right", getRightRangeDistance());
                     telemetry.update();
                 }
                 stopRobot();
-                sleep(1000);
-                while ((getLeftRangeDistance() > veryCloseToWallDistance && getRightRangeDistance() > veryCloseToWallDistance) && opModeIsActive()) {
-                    moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    telemetry.addData("left", getLeftRangeDistance());
-                    telemetry.addData("right", getRightRangeDistance());
-                    telemetry.update();
-                }
-                stopRobot();
-                sleep(1000);
-                while ((getLeftRangeDistance() > closestToWallDistance && getRightRangeDistance() > closestToWallDistance) && opModeIsActive()) {
-                    moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    telemetry.addData("left", getLeftRangeDistance());
-                    telemetry.addData("right", getRightRangeDistance());
-                    telemetry.update();
-                }
-                stopRobot();
-                sleep(1000);
-                while (getLeftRangeDistance() > closestToWallDistance || getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
-                    while (getLeftRangeDistance() > closestToWallDistance && opModeIsActive()) {
-                        moveLeftSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    }
-                    while (getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
-                        moveRightSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    }
-                }
-                stopRobot();
-                sleep(1000);
+                alignWithWall();
                 findTapeInward();
+                alignWithWall();
                 pushCorrectButton();
-                moveAlongBeaconWallDistance(DEFAULT_FORWARD_POWER, 5);
+                moveAlongBeaconWallDistance(DEFAULT_FORWARD_POWER, 90);
                 findTapeInward();
+                alignWithWall();
                 pushCorrectButton();
                 run = false;
             }
@@ -83,22 +59,26 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         }
     }
 
+    public void alignWithWall() {
+        //??????
+    }
+
     //These movements are with respect to the field. Different for red and blue because they mirror each other.
     public abstract void moveAcrossField(double power);
 
-    public abstract void moveAcrossFieldDistance(double power, double centimeters);
+    public abstract void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException;
 
     public void moveAlongStartWall(double power) {
         goLeft(power);
     }
 
-    public void moveAlongStartWallDistance(double power, double centimeters) {
+    public void moveAlongStartWallDistance(double power, double centimeters) throws InterruptedException {
         goLeftDistance(power, centimeters);
     }
 
     public abstract void moveAlongBeaconWall(double power);
 
-    public abstract void moveAlongBeaconWallDistance(double power, double centimeters);
+    public abstract void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException;
 
 
     //These movements are with respect to the autonomous side of the robot.
@@ -122,7 +102,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             telemetry.addData("light", frontTapeSensor.alpha());
             telemetry.update();
-            goForward(DEFAULT_FORWARD_POWER);
+            goForward(DEFAULT_FORWARD_POWER / 2.0);
         }
         stopRobot();
     }
@@ -131,7 +111,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             telemetry.addData("light", frontTapeSensor.alpha());
             telemetry.update();
-            goBackward(DEFAULT_FORWARD_POWER);
+            goBackward(DEFAULT_FORWARD_POWER / 2.0);
         }
         stopRobot();
     }
@@ -151,5 +131,41 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         if (backTapeLowThreshold < 0) {
             backTapeLowThreshold = 3;
         }
+    }
+
+    private void testApproachWall() throws InterruptedException {
+        while ((getLeftRangeDistance() > closeToWallDistance && getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
+            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
+            telemetry.addData("left", getLeftRangeDistance());
+            telemetry.addData("right", getRightRangeDistance());
+            telemetry.update();
+        }
+        stopRobot();
+        sleep(1000);
+        while ((getLeftRangeDistance() > veryCloseToWallDistance && getRightRangeDistance() > veryCloseToWallDistance) && opModeIsActive()) {
+            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
+            telemetry.addData("left", getLeftRangeDistance());
+            telemetry.addData("right", getRightRangeDistance());
+            telemetry.update();
+        }
+        stopRobot();
+        sleep(1000);
+        while ((getLeftRangeDistance() > closestToWallDistance && getRightRangeDistance() > closestToWallDistance) && opModeIsActive()) {
+            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
+            telemetry.addData("left", getLeftRangeDistance());
+            telemetry.addData("right", getRightRangeDistance());
+            telemetry.update();
+        }
+        stopRobot();
+        sleep(1000);
+        while (getLeftRangeDistance() > closestToWallDistance || getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
+            while (getLeftRangeDistance() > closestToWallDistance && opModeIsActive()) {
+                moveLeftSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
+            }
+            while (getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
+                moveRightSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
+            }
+        }
+
     }
 }
