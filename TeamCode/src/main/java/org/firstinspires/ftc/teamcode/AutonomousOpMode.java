@@ -132,7 +132,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         goForward(power);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_FORWARD;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            fixRpm(Math.abs(power) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
         }
         stopRobot();
     }
@@ -147,7 +147,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         goRight(power);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_SIDEWAYS;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            fixRpm(Math.abs(power) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
             logData("backLeft", String.valueOf(backLeftMotor.getCurrentPosition()));
             logData("backRight", String.valueOf(backRightMotor.getCurrentPosition()));
             logData("frontLeft", String.valueOf(frontLeftMotor.getCurrentPosition()));
@@ -176,9 +176,9 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         double totalEncoderTicks = centimeters * TICKS_PER_CM_DIAGONAL;
         while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
             if ((forward == 1 && sideways == 1) || (forward == -1 && sideways == -1)) {
-                fixRpm(Math.abs(power) * wheelMaxRpm, backRightMotor, frontLeftMotor);
+                fixRpm(Math.abs(power) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, frontLeftMotor);
             } else if ((forward == 1 && sideways == -1) || (forward == -1 && sideways == 1)) {
-                fixRpm(Math.abs(power) * wheelMaxRpm, backLeftMotor, frontRightMotor);
+                fixRpm(Math.abs(power) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, frontRightMotor);
             }
         }
         stopRobot();

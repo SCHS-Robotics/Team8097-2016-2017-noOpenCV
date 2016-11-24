@@ -31,22 +31,9 @@ public abstract class BaseOpMode extends LinearOpMode {
     DcMotor frontRightMotor;
     DcMotor leftLaunchMotor;
     DcMotor rightLaunchMotor;
-    HashMap<DcMotor, Integer> encoderStartPos = new HashMap<DcMotor, Integer>() {{
-        put(backLeftMotor, 0);
-        put(backRightMotor, 0);
-        put(frontLeftMotor, 0);
-        put(frontRightMotor, 0);
-        put(leftLaunchMotor, 0);
-        put(rightLaunchMotor, 0);
-    }};
-    HashMap<DcMotor, Integer> pulsesPerRevolution = new HashMap<DcMotor, Integer>() {{
-        put(backLeftMotor, 420);
-        put(backRightMotor, 420);
-        put(frontLeftMotor, 420);
-        put(frontRightMotor, 420);
-        put(leftLaunchMotor, 112);
-        put(rightLaunchMotor, 112);
-    }};
+    HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
+    int wheelEncoderPpr = 420;//TODO test
+    int launcherEncoderPpr = 112;
     int wheelMaxRpm = 105;//TODO test for experimental max
     int launcherMaxRpm = 1500;//theoretical 1650
     Servo rightFlapServo;
@@ -117,7 +104,7 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
     }
 
-    public double[] fixRpm(double rpm, DcMotor... motors) throws InterruptedException {
+    public double[] fixRpm(double rpm, int encoderPpr, DcMotor... motors) throws InterruptedException {
         final int waitTime = 250;
         double[] percentErrors = new double[motors.length];
         Arrays.fill(percentErrors, -2);
@@ -126,7 +113,7 @@ public abstract class BaseOpMode extends LinearOpMode {
             for (int i = 0; i < motors.length; i++) {
                 DcMotor motor = motors[i];
                 int direction = (int) Math.signum(motor.getPower());
-                double currentRpm = ((Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / pulsesPerRevolution.get(motor)) / (waitTime / 60000.0);
+                double currentRpm = ((Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
                 percentErrors[i] = (currentRpm - rpm) / rpm;
                 encoderStartPos.put(motor, Math.abs(motor.getCurrentPosition()));
                 motor.setPower(direction * (Math.abs(motor.getPower()) / (percentErrors[i] + 1)));
@@ -142,7 +129,7 @@ public abstract class BaseOpMode extends LinearOpMode {
         rightLaunchMotor.setPower(rpm / launcherMaxRpm);
         boolean done = false;
         while (!done) {
-            double[] percentErrors = fixRpm(rpm, leftLaunchMotor, rightLaunchMotor);
+            double[] percentErrors = fixRpm(rpm, launcherEncoderPpr, leftLaunchMotor, rightLaunchMotor);
             done = Math.abs(percentErrors[0]) <= 0.15 && Math.abs(percentErrors[1]) <= 0.15;
         }
     }
