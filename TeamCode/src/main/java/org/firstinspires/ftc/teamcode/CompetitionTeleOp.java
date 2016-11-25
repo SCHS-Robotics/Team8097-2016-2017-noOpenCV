@@ -137,7 +137,7 @@ public class CompetitionTeleOp extends BaseOpMode {
                     double magnitude = Math.sqrt(Math.pow(joystickInputX, 2) + Math.pow(joystickInputY, 2));
                     double angle = Math.toDegrees(Math.atan2(joystickInputY, joystickInputX));
                     angle -= (currentAngle - 90);
-                    goDirectionPolar(magnitude, angle);
+                    goDirectionPolar(magnitude, angle, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
                     spun = false;
                 }
                 updatePowers();
