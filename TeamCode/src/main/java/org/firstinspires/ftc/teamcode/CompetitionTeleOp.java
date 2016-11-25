@@ -34,6 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.Arrays;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -53,12 +55,27 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class CompetitionTeleOp extends BaseOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime pushButtonTime = new ElapsedTime();
+    private ElapsedTime pushButtonTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private final int waitTime = 20;
+
+    private int numAverage = 10;//10 averages waiting 10 milliseconds each takes 100 milliseconds.
+    private Double[] backLeftMotorPower = new Double[numAverage];
+    private Double[] backRightMotorPower = new Double[numAverage];
+    private Double[] frontLeftMotorPower = new Double[numAverage];
+    private Double[] frontRightMotorPower = new Double[numAverage];
+    private double backLeftPercentError = 0;
+    private double backRightPercentError = 0;
+    private double frontLeftPercentError = 0;
+    private double frontRightPercentError = 0;
+
+    public static double currentAngle = 90;//initialized in autonomous based on which one is run.
+    boolean spun = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         backLeftMotor = hardwareMap.dcMotor.get("backLeft");
         backRightMotor = hardwareMap.dcMotor.get("backRight");
@@ -70,25 +87,65 @@ public class CompetitionTeleOp extends BaseOpMode {
         rightFlapServo.setPosition(rightFlapInitPos);
         leftFlapServo.setPosition(leftFlapInitPos);
 
+        resetPowers();
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
         pushButtonTime.reset();
+        waitTimer.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
             //Movement
-            if (gamepad1.right_trigger > 0) {
-                spinRight(gamepad1.right_trigger / 2.0);
-            } else if (gamepad1.left_trigger > 0) {
-                spinLeft(gamepad1.left_trigger / 2.0);
-            } else {
-                double joystickInputY = -gamepad1.left_stick_y;
-                double joystickInputX = gamepad1.left_stick_x;
-                goDirection(joystickInputX, joystickInputY);
+            if (waitTimer.time() >= waitTime) {
+                waitTimer.reset();
+                if (backLeftMotorPower[numAverage - 1] != null) {
+                    if (enoughData(backLeftMotorPower))
+                        backLeftPercentError = (getPercentError(averagePower(backLeftMotorPower) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, waitTime * numAverage) + 1) * (backLeftPercentError + 1) - 1;
+                    if (enoughData(backRightMotorPower))
+                        backRightPercentError = (getPercentError(averagePower(backRightMotorPower) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, waitTime * numAverage) + 1) * (backRightPercentError + 1) - 1;
+                    if (enoughData(frontLeftMotorPower))
+                        frontLeftPercentError = (getPercentError(averagePower(frontLeftMotorPower) * wheelMaxRpm, wheelEncoderPpr, frontLeftMotor, waitTime * numAverage) + 1) * (frontLeftPercentError + 1) - 1;
+                    if (enoughData(frontRightMotorPower))
+                        frontRightPercentError = (getPercentError(averagePower(frontRightMotorPower) * wheelMaxRpm, wheelEncoderPpr, frontRightMotor, waitTime * numAverage) + 1) * (frontRightPercentError + 1) - 1;
+                    resetPowers();
+                }
+                if (gamepad1.right_trigger > 0 || gamepad1.left_trigger > 0) {
+                    if (!spun) {
+                        resetWheelEncoders();
+                        waitTimer.reset();
+                        resetPowers();
+                    }
+                    if (gamepad1.right_trigger > 0) {
+                        spinRight(gamepad1.right_trigger / 2.0, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    } else if (gamepad1.left_trigger > 0) {
+                        spinLeft(gamepad1.left_trigger / 2.0, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    }
+                    spun = true;
+                } else {
+                    if (spun) {
+                        double averageTicks = (backLeftMotor.getCurrentPosition() + backRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition() + frontRightMotor.getCurrentPosition()) / 4.0;
+                        currentAngle += -averageTicks / TICKS_PER_DEGREE;
+                        resetPowers();
+                    }
+                    double joystickInputX = gamepad1.left_stick_x;
+                    double joystickInputY = -gamepad1.left_stick_y;
+                    double magnitude = Math.sqrt(Math.pow(joystickInputX, 2) + Math.pow(joystickInputY, 2));
+                    double angle = Math.toDegrees(Math.atan2(joystickInputY, joystickInputX));
+                    angle -= (currentAngle - 90);
+                    goDirectionPolar(magnitude, angle);
+                    spun = false;
+                }
+                updatePowers();
+            }
+
+            if (gamepad1.guide) {
+                currentAngle = 90;
+                logData("Angle calibrated!", "Angle calibrated!");
             }
 
             //Button Pushers
@@ -101,7 +158,7 @@ public class CompetitionTeleOp extends BaseOpMode {
                 rightFlapServo.setPosition(rightFlapEndPos);
                 leftFlapServo.setPosition(leftFlapInitPos);
             }
-            if (pushButtonTime.time() >= 0.5) {
+            if (pushButtonTime.time() >= 500) {
                 rightFlapServo.setPosition(rightFlapInitPos);
                 leftFlapServo.setPosition(leftFlapInitPos);
             }
@@ -110,10 +167,87 @@ public class CompetitionTeleOp extends BaseOpMode {
         }
     }
 
-    protected void goDirection(double x, double y) {
-        backLeftMotor.setPower((y - x) / 1.0);
-        backRightMotor.setPower((-y - x) / 1.0);
-        frontLeftMotor.setPower((y + x) / 1.0);
-        frontRightMotor.setPower((-y + x) / 1.0);
+    public void goDirectionPolar(double magnitude, double angle) {
+        double x = magnitude * Math.cos(Math.toRadians(angle));
+        double y = magnitude * Math.sin(Math.toRadians(angle));
+        goDirection(x, y);
+    }
+
+    public void goDirectionPolar(double magnitude, double angle, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
+        double x = magnitude * Math.cos(Math.toRadians(angle));
+        double y = magnitude * Math.sin(Math.toRadians(angle));
+        goDirection(x, y, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+    }
+
+    public void goDirection(double x, double y) {
+        double sqrt2 = Math.sqrt(2);
+        backLeftMotor.setPower((y - x) / sqrt2);
+        backRightMotor.setPower((-y - x) / sqrt2);
+        frontLeftMotor.setPower((y + x) / sqrt2);
+        frontRightMotor.setPower((-y + x) / sqrt2);
+    }
+
+    public void goDirection(double x, double y, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
+        double sqrt2 = Math.sqrt(2);
+        backLeftMotor.setPower(((y - x) / sqrt2) / (backLeftPercentError + 1));
+        backRightMotor.setPower(((-y - x) / sqrt2) / (backRightPercentError + 1));
+        frontLeftMotor.setPower(((y + x) / sqrt2) / (frontLeftPercentError + 1));
+        frontRightMotor.setPower(((-y + x) / sqrt2) / (frontRightPercentError + 1));
+    }
+
+    public void spinRight(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
+        backLeftMotor.setPower(power / (backLeftPercentError + 1));
+        backRightMotor.setPower(power / (backRightPercentError + 1));
+        frontLeftMotor.setPower(power / (frontLeftPercentError + 1));
+        frontRightMotor.setPower(power / (frontRightPercentError + 1));
+    }
+
+    public void spinLeft(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
+        backLeftMotor.setPower(-power / (backLeftPercentError + 1));
+        backRightMotor.setPower(-power / (backRightPercentError + 1));
+        frontLeftMotor.setPower(-power / (frontLeftPercentError + 1));
+        frontRightMotor.setPower(-power / (frontRightPercentError + 1));
+    }
+
+    private void resetPowers() {
+        Arrays.fill(backLeftMotorPower, null);
+        Arrays.fill(backRightMotorPower, null);
+        Arrays.fill(frontLeftMotorPower, null);
+        Arrays.fill(frontRightMotorPower, null);
+        encoderStartPos.put(backLeftMotor, backLeftMotor.getCurrentPosition());
+        encoderStartPos.put(backRightMotor, backRightMotor.getCurrentPosition());
+        encoderStartPos.put(frontLeftMotor, frontLeftMotor.getCurrentPosition());
+        encoderStartPos.put(frontRightMotor, frontRightMotor.getCurrentPosition());
+    }
+
+    private void updatePowers() {
+        for (int i = 0; i < numAverage - 1; i++) {
+            backLeftMotorPower[i + 1] = backLeftMotorPower[i];
+            backRightMotorPower[i + 1] = backRightMotorPower[i];
+            frontLeftMotorPower[i + 1] = frontLeftMotorPower[i];
+            frontRightMotorPower[i + 1] = frontRightMotorPower[i];
+        }
+        backLeftMotorPower[0] = backLeftMotor.getPower() * (backLeftPercentError + 1);
+        backRightMotorPower[0] = backRightMotor.getPower() * (backRightPercentError + 1);
+        frontLeftMotorPower[0] = frontLeftMotor.getPower() * (frontLeftPercentError + 1);
+        frontRightMotorPower[0] = frontRightMotor.getPower() * (frontRightPercentError + 1);
+    }
+
+    private double averagePower(Double[] power) {
+        double average = 0;
+        for (int i = 0; i < numAverage; i++) {
+            average += power[i];
+        }
+        average /= numAverage;
+        return average;
+    }
+
+    private boolean enoughData(Double[] power) {
+        for (int i = 0; i < numAverage; i++) {
+            if (Math.abs(power[i]) < 0.2) {
+                return false;
+            }
+        }
+        return true;
     }
 }

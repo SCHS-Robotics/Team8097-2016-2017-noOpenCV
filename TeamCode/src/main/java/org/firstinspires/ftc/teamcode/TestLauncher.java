@@ -62,8 +62,8 @@ public class TestLauncher extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
         rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
@@ -75,8 +75,8 @@ public class TestLauncher extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
             launchMotorsRpm(1500);
             sleep(60000);
@@ -104,21 +104,21 @@ public class TestLauncher extends BaseOpMode {
 
             double currentLeftRpm = ((Math.abs(leftLaunchMotor.getCurrentPosition()) - leftStartPos) / 112.0) / (waitTime / 60000.0);
             leftPercentError = currentLeftRpm / rpm;
-            telemetry.addData("left encoder", Math.abs(leftLaunchMotor.getCurrentPosition()) - leftStartPos);
-            telemetry.addData("leftPercentError", leftPercentError);
+            logData("left encoder", Math.abs(leftLaunchMotor.getCurrentPosition()) - leftStartPos);
+            logData("leftPercentError", leftPercentError);
             leftStartPos = Math.abs(leftLaunchMotor.getCurrentPosition());
             leftLaunchMotor.setPower(-(Math.abs(leftLaunchMotor.getPower()) / leftPercentError));
-            telemetry.addData("left power", leftLaunchMotor.getPower());
+            logData("left power", leftLaunchMotor.getPower());
 
             double currentRightRpm = ((Math.abs(rightLaunchMotor.getCurrentPosition()) - rightStartPos) / 112.0) / (waitTime / 60000.0);
             rightPercentError = currentRightRpm / rpm;
-            telemetry.addData("right encoder", Math.abs(rightLaunchMotor.getCurrentPosition()) - rightStartPos);
-            telemetry.addData("rightPercentError", rightPercentError);
+            logData("right encoder", Math.abs(rightLaunchMotor.getCurrentPosition()) - rightStartPos);
+            logData("rightPercentError", rightPercentError);
             rightStartPos = Math.abs(rightLaunchMotor.getCurrentPosition());
             rightLaunchMotor.setPower((Math.abs(rightLaunchMotor.getPower()) / rightPercentError));
-            telemetry.addData("right power", rightLaunchMotor.getPower());
+            logData("right power", rightLaunchMotor.getPower());
 
-            telemetry.update();
+            updateTelemetry();
 
             if (waitTime - launcherTime.time() > 0) {
                 sleep((int) (waitTime - launcherTime.time()));

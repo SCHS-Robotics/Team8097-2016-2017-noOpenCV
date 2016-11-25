@@ -55,6 +55,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
 
     @Override
+    public void runOpMode() throws InterruptedException {
+        super.runOpMode();
+        CompetitionTeleOp.currentAngle = 270;
+    }
+
+    @Override
     public void moveAcrossField(double power) {
         goDiagonalBackwardLeft(power);
     }

@@ -63,8 +63,8 @@ public class RangeTest extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
 //        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
 //        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
@@ -87,8 +87,8 @@ public class RangeTest extends BaseOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             runtime.reset();
-//            telemetry.addData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
-//            telemetry.addData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+//            logData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+//            logData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 
 //            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];
 //            int leftUltrasonic = leftRangeReader.read(0x04, 1)[0];
@@ -99,7 +99,7 @@ public class RangeTest extends BaseOpMode {
             //display values
             logData("Right", rightUltrasonic);
             logData("Left", leftUltrasonic);
-            telemetry.update();
+            updateTelemetry();
 
 //            sleep((int) (50 - runtime.time()));
 

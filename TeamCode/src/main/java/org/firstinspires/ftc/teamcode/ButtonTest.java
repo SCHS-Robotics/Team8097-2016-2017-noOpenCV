@@ -58,8 +58,8 @@ public class ButtonTest extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         leftColorSensor = hardwareMap.colorSensor.get("leftColor");
         rightColorSensor = hardwareMap.colorSensor.get("rightColor");
@@ -79,9 +79,9 @@ public class ButtonTest extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Left Color", "red: " + leftColorSensor.red() + "blue: " + leftColorSensor.blue());
-            telemetry.addData("Right Color", "red: " + rightColorSensor.red() + "blue: " + rightColorSensor.blue());
+            logData("Status", "Run Time: " + runtime.toString());
+            logData("Left Color", "red: " + leftColorSensor.red() + "blue: " + leftColorSensor.blue());
+            logData("Right Color", "red: " + rightColorSensor.red() + "blue: " + rightColorSensor.blue());
 
             if (leftColorSensor.red() > rightColorSensor.red() && leftColorSensor.blue() < rightColorSensor.blue()) {
                 leftFlapServo.setPosition(leftFlapEndPos);
@@ -91,7 +91,7 @@ public class ButtonTest extends BaseOpMode {
                 leftFlapServo.setPosition(leftFlapInitPos);
             }
 
-            telemetry.update();
+            updateTelemetry();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }

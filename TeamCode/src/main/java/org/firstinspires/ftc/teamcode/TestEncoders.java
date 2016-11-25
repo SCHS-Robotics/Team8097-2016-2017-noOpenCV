@@ -56,8 +56,8 @@ public class TestEncoders extends AutonomousOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         allInit();
 
@@ -67,14 +67,14 @@ public class TestEncoders extends AutonomousOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
 //            goForward(DEFAULT_FORWARD_POWER);
-            telemetry.addData("backLeft", backLeftMotor.getCurrentPosition());
-            telemetry.addData("backRight", backRightMotor.getCurrentPosition());
-            telemetry.addData("frontLeft", frontLeftMotor.getCurrentPosition());
-            telemetry.addData("frontRight", frontRightMotor.getCurrentPosition());
+            logData("backLeft", backLeftMotor.getCurrentPosition());
+            logData("backRight", backRightMotor.getCurrentPosition());
+            logData("frontLeft", frontLeftMotor.getCurrentPosition());
+            logData("frontRight", frontRightMotor.getCurrentPosition());
             goRightDistance(DEFAULT_SIDEWAYS_POWER, 1);
             stopRobot();
             sleep(500000);

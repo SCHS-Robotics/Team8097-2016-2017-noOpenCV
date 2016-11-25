@@ -17,8 +17,8 @@ public class CalibrateServos extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         leftFlapServo = hardwareMap.servo.get("leftFlap");
         rightFlapServo = hardwareMap.servo.get("rightFlap");
@@ -31,8 +31,8 @@ public class CalibrateServos extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
             if (gamepad1.y) {
                 if (pos1 + 0.002 <= 1)
@@ -63,9 +63,9 @@ public class CalibrateServos extends BaseOpMode {
                     pos4 -= 0.002;
             }
             leftFlapServo.setPosition(pos1);
-            telemetry.addData("leftFlap", String.valueOf(pos1));
+            logData("leftFlap", String.valueOf(pos1));
             rightFlapServo.setPosition(pos2);
-            telemetry.addData("rightFlap", String.valueOf(pos2));
+            logData("rightFlap", String.valueOf(pos2));
             sleep(10);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

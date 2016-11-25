@@ -56,8 +56,8 @@ public class TapeTest extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
         frontTapeSensor.setI2cAddress(frontTapeI2c);
@@ -69,11 +69,11 @@ public class TapeTest extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            logData("Status", "Run Time: " + runtime.toString());
 
-            telemetry.addData("Light", frontTapeSensor.alpha());
+            logData("Light", frontTapeSensor.alpha());
 
-            telemetry.update();
+            updateTelemetry();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }

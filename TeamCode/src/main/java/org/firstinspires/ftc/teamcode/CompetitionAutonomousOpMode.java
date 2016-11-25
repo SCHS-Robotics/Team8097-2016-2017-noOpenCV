@@ -19,8 +19,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         allInit();
         loadTapeValues();
@@ -32,16 +32,16 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         // run until the end of the match (driver presses STOP)
         boolean run = true;
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
             if (run) {
                 moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 95 * Math.sqrt(2));
                 while ((getLeftRangeDistance() > closeToWallDistance/* || getRightRangeDistance() > closeToWallDistance*/) && opModeIsActive()) {
                     moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    telemetry.addData("left", getLeftRangeDistance());
-                    telemetry.addData("right", getRightRangeDistance());
-                    telemetry.update();
+                    logData("left", getLeftRangeDistance());
+                    logData("right", getRightRangeDistance());
+                    updateTelemetry();
                 }
                 stopRobot();
                 alignWithWall();
@@ -100,8 +100,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     public void findTapeRight() {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
-            telemetry.addData("light", frontTapeSensor.alpha());
-            telemetry.update();
+            logData("light", frontTapeSensor.alpha());
+            updateTelemetry();
             goForward(DEFAULT_FORWARD_POWER / 2.0);
         }
         stopRobot();
@@ -109,8 +109,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     public void findTapeLeft() {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
-            telemetry.addData("light", frontTapeSensor.alpha());
-            telemetry.update();
+            logData("light", frontTapeSensor.alpha());
+            updateTelemetry();
             goBackward(DEFAULT_FORWARD_POWER / 2.0);
         }
         stopRobot();
@@ -136,25 +136,25 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     private void testApproachWall() throws InterruptedException {
         while ((getLeftRangeDistance() > closeToWallDistance && getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
             moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            telemetry.addData("left", getLeftRangeDistance());
-            telemetry.addData("right", getRightRangeDistance());
-            telemetry.update();
+            logData("left", getLeftRangeDistance());
+            logData("right", getRightRangeDistance());
+            updateTelemetry();
         }
         stopRobot();
         sleep(1000);
         while ((getLeftRangeDistance() > veryCloseToWallDistance && getRightRangeDistance() > veryCloseToWallDistance) && opModeIsActive()) {
             moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            telemetry.addData("left", getLeftRangeDistance());
-            telemetry.addData("right", getRightRangeDistance());
-            telemetry.update();
+            logData("left", getLeftRangeDistance());
+            logData("right", getRightRangeDistance());
+            updateTelemetry();
         }
         stopRobot();
         sleep(1000);
         while ((getLeftRangeDistance() > closestToWallDistance && getRightRangeDistance() > closestToWallDistance) && opModeIsActive()) {
             moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            telemetry.addData("left", getLeftRangeDistance());
-            telemetry.addData("right", getRightRangeDistance());
-            telemetry.update();
+            logData("left", getLeftRangeDistance());
+            logData("right", getRightRangeDistance());
+            updateTelemetry();
         }
         stopRobot();
         sleep(1000);

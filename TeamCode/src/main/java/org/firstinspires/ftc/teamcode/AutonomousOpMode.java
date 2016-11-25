@@ -14,6 +14,20 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         frontRightMotor.setPower(0);
     }
 
+    public void spinRight(double power) {
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
+    }
+
+    public void spinLeft(double power) {
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
+    }
+
     public void goForward(double power) {
         backLeftMotor.setPower(power);
         backRightMotor.setPower(-power);
@@ -126,6 +140,21 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         frontRightMotor.setPower(power);
     }
 
+    public void spinRightDegrees(double power, double degrees) throws InterruptedException {
+        resetWheelEncoders();
+        fixRpmTimer.reset();
+        spinRight(power);
+        double totalEncoderTicks = degrees * TICKS_PER_DEGREE;
+        while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
+            fixRpm(Math.abs(power) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+        }
+        stopRobot();
+    }
+
+    public void spinLeftDegrees(double power, double degrees) throws InterruptedException {
+        spinRightDegrees(-power, degrees);
+    }
+
     public void goForwardDistance(double power, double centimeters) throws InterruptedException {
         resetWheelEncoders();
         fixRpmTimer.reset();
@@ -152,7 +181,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
             logData("backRight", String.valueOf(backRightMotor.getCurrentPosition()));
             logData("frontLeft", String.valueOf(frontLeftMotor.getCurrentPosition()));
             logData("frontRight", String.valueOf(frontRightMotor.getCurrentPosition()));
-            telemetry.update();
+            updateTelemetry();
         }
         stopRobot();
     }

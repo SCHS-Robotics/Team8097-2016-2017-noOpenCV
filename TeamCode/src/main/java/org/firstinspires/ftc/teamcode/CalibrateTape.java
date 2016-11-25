@@ -18,8 +18,8 @@ public class CalibrateTape extends BaseOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logData("Status", "Initialized");
+        updateTelemetry();
 
         readings = 0;
         FtcRobotControllerActivity.calibrateTape = false;
@@ -37,13 +37,13 @@ public class CalibrateTape extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            logData("Status", "Run Time: " + runtime.toString());
+            updateTelemetry();
 
             frontTapeSensor.enableLed(true);
 //            backTapeSensor.enableLed(true);
-            telemetry.addData("front light sensor", frontTapeSensor.alpha());
-//            telemetry.addData("back light sensor", backTapeSensor.alpha());
+            logData("front light sensor", frontTapeSensor.alpha());
+//            logData("back light sensor", backTapeSensor.alpha());
             if (FtcRobotControllerActivity.calibrateTape) {
                 if (readings < 100) {
                     readings++;
