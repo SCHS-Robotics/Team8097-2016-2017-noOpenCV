@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.util.TypeConversion;
 
 public abstract class AutonomousOpMode extends BaseOpMode {
 
@@ -233,12 +232,12 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         return Math.max(Math.max(Math.abs(backLeftMotor.getCurrentPosition()), Math.abs(backRightMotor.getCurrentPosition())), Math.max(Math.abs(frontLeftMotor.getCurrentPosition()), Math.abs(frontRightMotor.getCurrentPosition())));
     }
 
-    public int getRightRangeDistance() {
-        return rightRangeSensor.rawUltrasonic();
-    }
+//    public int getRightRangeDistance() {
+//        return rightRangeSensor.rawUltrasonic();
+//    }
 
-    public int getLeftRangeDistance() {
-        return leftRangeSensor.rawUltrasonic();
+    public int getRangeDistance() {
+        return rangeSensor.rawUltrasonic();
     }
 
     public int[] getAverageColor(ColorSensor... colorSensors) throws InterruptedException {

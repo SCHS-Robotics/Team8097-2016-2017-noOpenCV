@@ -32,15 +32,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
-import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -58,6 +55,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Autonomous(name = "Range Test", group = "Test")
 public class RangeTest extends BaseOpMode {
 
+    RangeSensor leftRangeSensor;
+    RangeSensor rightRangeSensor;
+
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -67,14 +67,14 @@ public class RangeTest extends BaseOpMode {
         updateTelemetry();
 
 //        rightRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rightRange");
-//        leftRangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
+//        rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "leftRange");
 //        rightRangeSensor.setI2cAddress(rightRangeI2c);
-//        leftRangeSensor.setI2cAddress(leftRangeI2c);
+//        rangeSensor.setI2cAddress(rangeI2c);
 
         I2cDevice rightRangeDevice = hardwareMap.i2cDevice.get("rightRange");
         I2cDevice leftRangeDevice = hardwareMap.i2cDevice.get("leftRange");
-        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, rightRangeI2c, false);
-        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, leftRangeI2c, false);
+        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, I2cAddr.create8bit(0x38), false);
+        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, rangeI2c, false);
         leftRangeSensor = new RangeSensor(leftRangeReader);
         rightRangeSensor = new RangeSensor(rightRangeReader);
 
@@ -87,7 +87,7 @@ public class RangeTest extends BaseOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             runtime.reset();
-//            logData("Left Distance", leftRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
+//            logData("Left Distance", rangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 //            logData("Right Distance", rightRangeSensor.getDistance(DistanceUnit.INCH) + " inches");
 
 //            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];

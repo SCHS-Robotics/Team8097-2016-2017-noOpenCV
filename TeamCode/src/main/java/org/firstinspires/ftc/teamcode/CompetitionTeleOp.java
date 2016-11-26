@@ -59,7 +59,7 @@ public class CompetitionTeleOp extends BaseOpMode {
     private ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final int waitTime = 20;
 
-    private int numAverage = 10;//10 averages waiting 10 milliseconds each takes 100 milliseconds.
+    private int numAverage = 10;//10 averages waiting 20 milliseconds each takes 200 milliseconds.
     private Double[] backLeftMotorPower = new Double[numAverage];
     private Double[] backRightMotorPower = new Double[numAverage];
     private Double[] frontLeftMotorPower = new Double[numAverage];

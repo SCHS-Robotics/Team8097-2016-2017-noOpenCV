@@ -1,14 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 
 public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
 
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
@@ -27,20 +21,14 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
         boolean run = true;
         while (opModeIsActive()) {
-            logData("Status", "Run Time: " + runtime.toString());
-            updateTelemetry();
-
             if (run) {
                 moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 95 * Math.sqrt(2));
-                while ((getLeftRangeDistance() > closeToWallDistance/* || getRightRangeDistance() > closeToWallDistance*/) && opModeIsActive()) {
+                while (getRangeDistance() > closeToWallDistance && opModeIsActive()) {
                     moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-                    logData("left", getLeftRangeDistance());
-                    logData("right", getRightRangeDistance());
+                    logData("sensor distance", getRangeDistance());
                     updateTelemetry();
                 }
                 stopRobot();
@@ -131,41 +119,5 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         if (backTapeLowThreshold < 0) {
             backTapeLowThreshold = 3;
         }
-    }
-
-    private void testApproachWall() throws InterruptedException {
-        while ((getLeftRangeDistance() > closeToWallDistance && getRightRangeDistance() > closeToWallDistance) && opModeIsActive()) {
-            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            logData("left", getLeftRangeDistance());
-            logData("right", getRightRangeDistance());
-            updateTelemetry();
-        }
-        stopRobot();
-        sleep(1000);
-        while ((getLeftRangeDistance() > veryCloseToWallDistance && getRightRangeDistance() > veryCloseToWallDistance) && opModeIsActive()) {
-            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            logData("left", getLeftRangeDistance());
-            logData("right", getRightRangeDistance());
-            updateTelemetry();
-        }
-        stopRobot();
-        sleep(1000);
-        while ((getLeftRangeDistance() > closestToWallDistance && getRightRangeDistance() > closestToWallDistance) && opModeIsActive()) {
-            moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
-            logData("left", getLeftRangeDistance());
-            logData("right", getRightRangeDistance());
-            updateTelemetry();
-        }
-        stopRobot();
-        sleep(1000);
-        while (getLeftRangeDistance() > closestToWallDistance || getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
-            while (getLeftRangeDistance() > closestToWallDistance && opModeIsActive()) {
-                moveLeftSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
-            }
-            while (getRightRangeDistance() > closestToWallDistance && opModeIsActive()) {
-                moveRightSideForward(DEFAULT_SIDEWAYS_POWER / 4.0);
-            }
-        }
-
     }
 }
