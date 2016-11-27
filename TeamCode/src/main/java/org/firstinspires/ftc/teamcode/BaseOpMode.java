@@ -36,6 +36,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     DcMotor frontRightMotor;
     DcMotor leftLaunchMotor;
     DcMotor rightLaunchMotor;
+    DcMotor collectionMotor;
     HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     int wheelEncoderPpr = 1680;
     int launcherEncoderPpr = 112;
@@ -64,6 +65,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapEndPos = 0.162;
     double rightFlapEndPos = 0.936;
     double rangeServoInitPos = 0.460;
+    double launcherServoInitPos = 0;//TODO
 
     ElapsedTime fixRpmTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -127,13 +129,9 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public double applyPercentErrorToWheelPower(double power, double percentError) {
-        if (power >= getPowerEstimateFromPercentSpeed(0.5)) {
-            double estimatedRpm = getRpmEstimate(power);
-            double modifiedRpm = estimatedRpm / (percentError + 1);
-            return Math.signum(power) * getPowerEstimate(modifiedRpm);
-        } else {
-            return power;
-        }
+        double estimatedRpm = getRpmEstimate(power);
+        double modifiedRpm = estimatedRpm / (percentError + 1);
+        return Math.signum(power) * getPowerEstimate(modifiedRpm);
     }
 
     public double reversePercentErrorOnWheelPower(double resultPower, double percentError) {
@@ -192,25 +190,24 @@ public abstract class BaseOpMode extends LinearOpMode {
         backRightMotor = hardwareMap.dcMotor.get("backRight");
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
         frontRightMotor = hardwareMap.dcMotor.get("frontRight");
-
-//        leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
-//        rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
-//        leftLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        rightLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
+        rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
+        leftLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        collectionMotor = hardwareMap.dcMotor.get("collection");
 
 //        I2cDevice rightRangeDevice = hardwareMap.i2cDevice.get("rightRange");
-        I2cDevice leftRangeDevice = hardwareMap.i2cDevice.get("range");
+        I2cDevice rangeDevice = hardwareMap.i2cDevice.get("range");
 //        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, rightRangeI2c, false);
-        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, rangeI2c, false);
+        I2cDeviceSynch rangeReader = new I2cDeviceSynchImpl(rangeDevice, rangeI2c, false);
 //        rightRangeSensor = new RangeSensor(rightRangeReader);
-        rangeSensor = new RangeSensor(leftRangeReader);
+        rangeSensor = new RangeSensor(rangeReader);
 
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
 //        backTapeSensor = hardwareMap.colorSensor.get("backTape");
         frontTapeSensor.setI2cAddress(frontTapeI2c);
         frontTapeSensor.enableLed(true);
 //        backTapeSensor.enableLed(true);
-
         rightColorSensor = hardwareMap.colorSensor.get("rightColor");
         leftColorSensor = hardwareMap.colorSensor.get("leftColor");
         rightColorSensor.setI2cAddress(rightColorI2c);
@@ -222,5 +219,9 @@ public abstract class BaseOpMode extends LinearOpMode {
         leftFlapServo = hardwareMap.servo.get("leftFlap");
         rightFlapServo.setPosition(rightFlapInitPos);
         leftFlapServo.setPosition(leftFlapInitPos);
+        rangeServo = hardwareMap.servo.get("rangeServo");
+        rangeServo.setPosition(rangeServoInitPos);
+        launcherServo = hardwareMap.servo.get("launcherServo");
+        launcherServo.setPosition(launcherServoInitPos);
     }
 }

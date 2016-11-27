@@ -7,9 +7,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
 
-    final double closeToWallDistance = 60;//centimeters
-    final double veryCloseToWallDistance = 30;//centimeters
-    final double closestToWallDistance = 10;//centimeters
+    final double closeToWallDistance = 30;//centimeters
+    final double buttonPushingDistance = 10;//centimeters
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -32,7 +31,6 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
                     updateTelemetry();
                 }
                 stopRobot();
-                alignWithWall();
                 findTapeInward();
                 alignWithWall();
                 pushCorrectButton();
@@ -54,6 +52,17 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         } else if (angleOffset < -2) {
             spinLeftDegrees(DEFAULT_SPIN_SPEED, -angleOffset);
         }
+        sleep(100);
+        if (getRangeDistance() > buttonPushingDistance) {
+            while (getRangeDistance() > buttonPushingDistance) {
+                moveAlongStartWall(DEFAULT_SIDEWAYS_SPEED * 0.8);
+            }
+        } else if (getRangeDistance() < buttonPushingDistance) {
+            while (getRangeDistance() < buttonPushingDistance) {
+                moveAlongStartWall(-DEFAULT_SIDEWAYS_SPEED * 0.8);
+            }
+        }
+        stopRobot();
     }
 
     //These movements are with respect to the field. Different for red and blue because they mirror each other.
