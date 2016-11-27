@@ -105,25 +105,25 @@ public class CompetitionTeleOp extends BaseOpMode {
                 waitTimer.reset();
                 if (backLeftMotorPower[numAverage - 1] != null) {
                     if (enoughData(backLeftMotorPower))
-                        backLeftPercentError = (getPercentError(averagePower(backLeftMotorPower) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, waitTime * numAverage) + 1) * (backLeftPercentError + 1) - 1;
+                        backLeftPercentError = (getPercentError(averagePower(backLeftMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, backLeftMotor, waitTime * numAverage)) + 1) * (backLeftPercentError + 1) - 1;
                     if (enoughData(backRightMotorPower))
-                        backRightPercentError = (getPercentError(averagePower(backRightMotorPower) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, waitTime * numAverage) + 1) * (backRightPercentError + 1) - 1;
+                        backRightPercentError = (getPercentError(averagePower(backRightMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, backRightMotor, waitTime * numAverage)) + 1) * (backRightPercentError + 1) - 1;
                     if (enoughData(frontLeftMotorPower))
-                        frontLeftPercentError = (getPercentError(averagePower(frontLeftMotorPower) * wheelMaxRpm, wheelEncoderPpr, frontLeftMotor, waitTime * numAverage) + 1) * (frontLeftPercentError + 1) - 1;
+                        frontLeftPercentError = (getPercentError(averagePower(frontLeftMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, frontLeftMotor, waitTime * numAverage)) + 1) * (frontLeftPercentError + 1) - 1;
                     if (enoughData(frontRightMotorPower))
-                        frontRightPercentError = (getPercentError(averagePower(frontRightMotorPower) * wheelMaxRpm, wheelEncoderPpr, frontRightMotor, waitTime * numAverage) + 1) * (frontRightPercentError + 1) - 1;
+                        frontRightPercentError = (getPercentError(averagePower(frontRightMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, frontRightMotor, waitTime * numAverage)) + 1) * (frontRightPercentError + 1) - 1;
                     resetPowers();
                 }
-                if (gamepad1.right_trigger > 0 || gamepad1.left_trigger > 0) {
+                if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
                     if (!spun) {
                         resetWheelEncoders();
                         waitTimer.reset();
                         resetPowers();
                     }
-                    if (gamepad1.right_trigger > 0) {
-                        spinRight(gamepad1.right_trigger / 2.0, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
-                    } else if (gamepad1.left_trigger > 0) {
-                        spinLeft(gamepad1.left_trigger / 2.0, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    if (gamepad1.right_trigger > 0.5) {
+                        spinRight(getPowerEstimateFromPercentSpeed(gamepad1.right_trigger), backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    } else if (gamepad1.left_trigger > 0.5) {
+                        spinLeft(getPowerEstimateFromPercentSpeed(gamepad1.left_trigger), backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
                     }
                     spun = true;
                 } else {
@@ -167,11 +167,11 @@ public class CompetitionTeleOp extends BaseOpMode {
         }
     }
 
-    public void goDirectionPolar(double magnitude, double angle) {
-        double x = magnitude * Math.cos(Math.toRadians(angle));
-        double y = magnitude * Math.sin(Math.toRadians(angle));
-        goDirection(x, y);
-    }
+//    public void goDirectionPolar(double magnitude, double angle) {
+//        double x = magnitude * Math.cos(Math.toRadians(angle));
+//        double y = magnitude * Math.sin(Math.toRadians(angle));
+//        goDirection(x, y);
+//    }
 
     public void goDirectionPolar(double magnitude, double angle, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
         double x = magnitude * Math.cos(Math.toRadians(angle));
@@ -179,34 +179,34 @@ public class CompetitionTeleOp extends BaseOpMode {
         goDirection(x, y, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
     }
 
-    public void goDirection(double x, double y) {
-        double sqrt2 = Math.sqrt(2);
-        backLeftMotor.setPower((y - x) / sqrt2);
-        backRightMotor.setPower((-y - x) / sqrt2);
-        frontLeftMotor.setPower((y + x) / sqrt2);
-        frontRightMotor.setPower((-y + x) / sqrt2);
-    }
+//    public void goDirection(double x, double y) {
+//        double sqrt2 = Math.sqrt(2);
+//        backLeftMotor.setPower((y - x) / sqrt2);
+//        backRightMotor.setPower((-y - x) / sqrt2);
+//        frontLeftMotor.setPower((y + x) / sqrt2);
+//        frontRightMotor.setPower((-y + x) / sqrt2);
+//    }
 
     public void goDirection(double x, double y, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
         double sqrt2 = Math.sqrt(2);
-        backLeftMotor.setPower(((y - x) / sqrt2) / (backLeftPercentError + 1));
-        backRightMotor.setPower(((-y - x) / sqrt2) / (backRightPercentError + 1));
-        frontLeftMotor.setPower(((y + x) / sqrt2) / (frontLeftPercentError + 1));
-        frontRightMotor.setPower(((-y + x) / sqrt2) / (frontRightPercentError + 1));
+        backLeftMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((y - x) / sqrt2), backLeftPercentError));
+        backRightMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((-y - x) / sqrt2), backRightPercentError));
+        frontLeftMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((y + x) / sqrt2), frontLeftPercentError));
+        frontRightMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((-y + x) / sqrt2), frontRightPercentError));
     }
 
     public void spinRight(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        backLeftMotor.setPower(power / (backLeftPercentError + 1));
-        backRightMotor.setPower(power / (backRightPercentError + 1));
-        frontLeftMotor.setPower(power / (frontLeftPercentError + 1));
-        frontRightMotor.setPower(power / (frontRightPercentError + 1));
+        backLeftMotor.setPower(applyPercentErrorToWheelPower(power, backLeftPercentError));
+        backRightMotor.setPower(applyPercentErrorToWheelPower(power, backRightPercentError));
+        frontLeftMotor.setPower(applyPercentErrorToWheelPower(power, frontLeftPercentError));
+        frontRightMotor.setPower(applyPercentErrorToWheelPower(power, frontRightPercentError));
     }
 
     public void spinLeft(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        backLeftMotor.setPower(-power / (backLeftPercentError + 1));
-        backRightMotor.setPower(-power / (backRightPercentError + 1));
-        frontLeftMotor.setPower(-power / (frontLeftPercentError + 1));
-        frontRightMotor.setPower(-power / (frontRightPercentError + 1));
+        backLeftMotor.setPower(applyPercentErrorToWheelPower(-power, backLeftPercentError));
+        backRightMotor.setPower(applyPercentErrorToWheelPower(-power, backRightPercentError));
+        frontLeftMotor.setPower(applyPercentErrorToWheelPower(-power, frontLeftPercentError));
+        frontRightMotor.setPower(applyPercentErrorToWheelPower(-power, frontRightPercentError));
     }
 
     private void resetPowers() {
@@ -227,10 +227,10 @@ public class CompetitionTeleOp extends BaseOpMode {
             frontLeftMotorPower[i + 1] = frontLeftMotorPower[i];
             frontRightMotorPower[i + 1] = frontRightMotorPower[i];
         }
-        backLeftMotorPower[0] = backLeftMotor.getPower() * (backLeftPercentError + 1);
-        backRightMotorPower[0] = backRightMotor.getPower() * (backRightPercentError + 1);
-        frontLeftMotorPower[0] = frontLeftMotor.getPower() * (frontLeftPercentError + 1);
-        frontRightMotorPower[0] = frontRightMotor.getPower() * (frontRightPercentError + 1);
+        backLeftMotorPower[0] = reversePercentErrorOnWheelPower(backLeftMotor.getPower(), backLeftPercentError);
+        backRightMotorPower[0] = reversePercentErrorOnWheelPower(backRightMotor.getPower(), backRightPercentError);
+        frontLeftMotorPower[0] = reversePercentErrorOnWheelPower(frontLeftMotor.getPower(), frontLeftPercentError);
+        frontRightMotorPower[0] = reversePercentErrorOnWheelPower(frontRightMotor.getPower(), frontRightPercentError);
     }
 
     private double averagePower(Double[] power) {
@@ -244,7 +244,7 @@ public class CompetitionTeleOp extends BaseOpMode {
 
     private boolean enoughData(Double[] power) {
         for (int i = 0; i < numAverage; i++) {
-            if (Math.abs(power[i]) < 0.2) {
+            if (Math.abs(power[i]) < getPowerEstimateFromPercentSpeed(0.5)) {
                 return false;
             }
         }

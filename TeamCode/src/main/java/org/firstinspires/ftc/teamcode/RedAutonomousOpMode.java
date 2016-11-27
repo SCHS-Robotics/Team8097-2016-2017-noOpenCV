@@ -57,17 +57,17 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        CompetitionTeleOp.currentAngle = 90;
+        CompetitionTeleOp.currentAngle = 270;
     }
 
     @Override
     public void moveAcrossField(double power) {
-        goDiagonalForwardLeft(power);
+        goDiagonalBackwardRight(power);
     }
 
     @Override
     public void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException {
-        goDiagonalForwardLeftDistance(power, centimeters);
+        goDiagonalBackwardRightDistance(power, centimeters);
     }
 
     @Override

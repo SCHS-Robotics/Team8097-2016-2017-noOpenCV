@@ -25,9 +25,9 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         boolean run = true;
         while (opModeIsActive()) {
             if (run) {
-                moveAcrossFieldDistance(DEFAULT_DIAGONAL_POWER, 95 * Math.sqrt(2));
+                moveAcrossFieldDistance(DEFAULT_DIAGONAL_SPEED, 95 * Math.sqrt(2));
                 while (getRangeDistance() > closeToWallDistance && opModeIsActive()) {
-                    moveAlongStartWall(DEFAULT_SIDEWAYS_POWER / 4.0);
+                    moveAlongStartWall(DEFAULT_SIDEWAYS_SPEED * 0.8);
                     logData("sensor distance", getRangeDistance());
                     updateTelemetry();
                 }
@@ -36,7 +36,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
                 findTapeInward();
                 alignWithWall();
                 pushCorrectButton();
-                moveAlongBeaconWallDistance(DEFAULT_FORWARD_POWER, 90);
+                moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 90);
                 findTapeInward();
                 alignWithWall();
                 pushCorrectButton();
@@ -47,8 +47,13 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         }
     }
 
-    public void alignWithWall() {
-        //??????
+    public void alignWithWall() throws InterruptedException {
+        double angleOffset = determineAngleOffset();
+        if (angleOffset > 2) {
+            spinRightDegrees(DEFAULT_SPIN_SPEED, angleOffset);
+        } else if (angleOffset < -2) {
+            spinLeftDegrees(DEFAULT_SPIN_SPEED, -angleOffset);
+        }
     }
 
     //These movements are with respect to the field. Different for red and blue because they mirror each other.
@@ -57,11 +62,11 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     public abstract void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException;
 
     public void moveAlongStartWall(double power) {
-        goLeft(power);
+        goRight(power);
     }
 
     public void moveAlongStartWallDistance(double power, double centimeters) throws InterruptedException {
-        goLeftDistance(power, centimeters);
+        goRightDistance(power, centimeters);
     }
 
     public abstract void moveAlongBeaconWall(double power);
@@ -71,26 +76,26 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     //These movements are with respect to the autonomous side of the robot.
     public void moveLeftSideForward(double power) {
-        moveBackWheelsLeft(power);
+        moveFrontWheelsRight(power);
     }
 
     public void moveLeftSideBackward(double power) {
-        moveBackWheelsRight(power);
-    }
-
-    public void moveRightSideForward(double power) {
         moveFrontWheelsLeft(power);
     }
 
+    public void moveRightSideForward(double power) {
+        moveBackWheelsRight(power);
+    }
+
     public void moveRightSideBackward(double power) {
-        moveFrontWheelsRight(power);
+        moveBackWheelsLeft(power);
     }
 
     public void findTapeRight() {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goForward(DEFAULT_FORWARD_POWER / 2.0);
+            goBackward(DEFAULT_FORWARD_SPEED * 0.85);
         }
         stopRobot();
     }
@@ -99,7 +104,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goBackward(DEFAULT_FORWARD_POWER / 2.0);
+            goForward(DEFAULT_FORWARD_SPEED * 0.85);
         }
         stopRobot();
     }

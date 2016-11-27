@@ -39,6 +39,8 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.HashMap;
+
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -55,9 +57,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name = "Range Test", group = "Test")
 public class RangeTest extends BaseOpMode {
 
-    RangeSensor leftRangeSensor;
-    RangeSensor rightRangeSensor;
-
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -71,12 +70,10 @@ public class RangeTest extends BaseOpMode {
 //        rightRangeSensor.setI2cAddress(rightRangeI2c);
 //        rangeSensor.setI2cAddress(rangeI2c);
 
-        I2cDevice rightRangeDevice = hardwareMap.i2cDevice.get("rightRange");
-        I2cDevice leftRangeDevice = hardwareMap.i2cDevice.get("leftRange");
-        I2cDeviceSynch rightRangeReader = new I2cDeviceSynchImpl(rightRangeDevice, I2cAddr.create8bit(0x38), false);
-        I2cDeviceSynch leftRangeReader = new I2cDeviceSynchImpl(leftRangeDevice, rangeI2c, false);
-        leftRangeSensor = new RangeSensor(leftRangeReader);
-        rightRangeSensor = new RangeSensor(rightRangeReader);
+        I2cDevice rangeDevice = hardwareMap.i2cDevice.get("range");
+        I2cDeviceSynch rangeReader = new I2cDeviceSynchImpl(rangeDevice, rangeI2c, false);
+        rangeSensor = new RangeSensor(rangeReader);
+        rangeServo = hardwareMap.servo.get("rangeServo");
 
 //        rightRangeReader.engage();
 //        leftRangeReader.engage();
@@ -93,17 +90,43 @@ public class RangeTest extends BaseOpMode {
 //            int rightUltrasonic = rightRangeReader.read(0x04, 1)[0];
 //            int leftUltrasonic = leftRangeReader.read(0x04, 1)[0];
 
-            int rightUltrasonic = rightRangeSensor.rawUltrasonic();
-            int leftUltrasonic = leftRangeSensor.rawUltrasonic();
+            logData("degrees", determineAngleOffset());
 
             //display values
-            logData("Right", rightUltrasonic);
-            logData("Left", leftUltrasonic);
             updateTelemetry();
+            sleep(10000000);
 
 //            sleep((int) (50 - runtime.time()));
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
+    }
+
+    public double determineAngleOffset() throws InterruptedException {
+        double angleWindow = 60;
+        double startPos = rangeServoInitPos - ((angleWindow / 2) * SERVO_POS_PER_DEGREE);
+        double angleIncrement = 2;
+        int numReads = (int) Math.round(angleWindow / angleIncrement);
+        int[] distances = new int[numReads];
+        int minDistance = 255;
+        double firstMinPos = 0;
+        double lastMinPos = 1;
+        for (int i = 0; i < numReads; i++) {
+            double pos = startPos + (angleIncrement * SERVO_POS_PER_DEGREE * i);
+            rangeServo.setPosition(pos);
+            sleep(100);
+            int ultrasonic = rangeSensor.rawUltrasonic();
+            logData("distance", ultrasonic);
+            updateTelemetry();
+            distances[i] = ultrasonic;
+            if (ultrasonic < minDistance) {
+                minDistance = ultrasonic;
+                firstMinPos = pos;
+            } else if (ultrasonic == minDistance) {
+                lastMinPos = pos;
+            }
+        }
+        rangeServo.setPosition(((lastMinPos + firstMinPos) / 2));
+        return (((lastMinPos + firstMinPos) / 2) - 0.5) / SERVO_POS_PER_DEGREE;
     }
 }

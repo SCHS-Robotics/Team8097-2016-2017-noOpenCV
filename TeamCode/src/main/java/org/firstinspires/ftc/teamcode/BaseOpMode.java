@@ -18,14 +18,17 @@ import java.util.HashMap;
 
 public abstract class BaseOpMode extends LinearOpMode {
 
-    public final static double DEFAULT_FORWARD_POWER = 0.5;
-    public final static double DEFAULT_DIAGONAL_POWER = 0.5;
-    public final static double DEFAULT_SIDEWAYS_POWER = 1;
+    public final static double DEFAULT_FORWARD_SPEED = 0.9;
+    public final static double DEFAULT_DIAGONAL_SPEED = 0.9;
+    public final static double DEFAULT_SIDEWAYS_SPEED = 1;
+    public final static double DEFAULT_SPIN_SPEED = 1;
 
     public final static double TICKS_PER_CM_FORWARD = 53.565;
     public final static double TICKS_PER_CM_SIDEWAYS = 70.304;
     public final static double TICKS_PER_CM_DIAGONAL = 88.348;
     public final static double TICKS_PER_DEGREE = 10000;//TODO
+
+    public final static double SERVO_POS_PER_DEGREE = 1.0 / 151.0;
 
     DcMotor backLeftMotor;
     DcMotor backRightMotor;
@@ -34,12 +37,15 @@ public abstract class BaseOpMode extends LinearOpMode {
     DcMotor leftLaunchMotor;
     DcMotor rightLaunchMotor;
     HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
-    int wheelEncoderPpr = 420;//TODO test
+    int wheelEncoderPpr = 1680;
     int launcherEncoderPpr = 112;
-    int wheelMaxRpm = 105;//TODO test for experimental max
+    int wheelMaxRpm = 105;
+    double theConstant = 7;
     int launcherMaxRpm = 1500;//theoretical 1650
     Servo rightFlapServo;
     Servo leftFlapServo;
+    Servo rangeServo;
+    Servo launcherServo;
     ColorSensor rightColorSensor;
     ColorSensor leftColorSensor;
     ColorSensor frontTapeSensor;
@@ -57,6 +63,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     double rightFlapInitPos = 0.780;
     double leftFlapEndPos = 0.162;
     double rightFlapEndPos = 0.936;
+    double rangeServoInitPos = 0.460;
 
     ElapsedTime fixRpmTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -103,6 +110,38 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
     }
 
+    public double getRpmEstimate(double power) {
+        return Math.max((wheelMaxRpm + theConstant) - (theConstant / Math.abs(power)), 0);
+    }
+
+    public double getPowerEstimateFromPercentSpeed(double percentSpeed) {
+        double rpm = Math.abs(percentSpeed) * wheelMaxRpm;
+        return getPowerEstimate(rpm) * Math.signum(percentSpeed);
+    }
+
+    public double getPowerEstimate(double rpm) {
+        if (rpm == 0) {
+            return 0;
+        }
+        return -theConstant / (rpm - (wheelMaxRpm + theConstant));
+    }
+
+    public double applyPercentErrorToWheelPower(double power, double percentError) {
+        if (power >= getPowerEstimateFromPercentSpeed(0.5)) {
+            double estimatedRpm = getRpmEstimate(power);
+            double modifiedRpm = estimatedRpm / (percentError + 1);
+            return Math.signum(power) * getPowerEstimate(modifiedRpm);
+        } else {
+            return power;
+        }
+    }
+
+    public double reversePercentErrorOnWheelPower(double resultPower, double percentError) {
+        double modifiedRpm = getRpmEstimate(resultPower);
+        double originalEstimatedRpm = modifiedRpm * (percentError + 1);
+        return Math.signum(resultPower) * getPowerEstimate(originalEstimatedRpm);
+    }
+
     public double[] fixRpm(double rpm, int encoderPpr, DcMotor... motors) throws InterruptedException {
         final int waitTime = 250;
         double[] percentErrors = new double[motors.length];
@@ -111,16 +150,28 @@ public abstract class BaseOpMode extends LinearOpMode {
             fixRpmTimer.reset();
             for (int i = 0; i < motors.length; i++) {
                 DcMotor motor = motors[i];
-                percentErrors[i] = getPercentError(rpm, encoderPpr, motor, waitTime);
+                double currentRpm = getCurrentRpm(encoderPpr, motor, waitTime);
+                percentErrors[i] = getPercentError(rpm, currentRpm);
+                double newPower;
+                if (encoderPpr == wheelEncoderPpr) {
+                    double modifiedRpm = rpm / (percentErrors[i] + 1);
+                    newPower = Math.signum(motor.getPower()) * getPowerEstimate(modifiedRpm);
+                } else {
+                    newPower = motor.getPower() / (percentErrors[i] + 1);
+                }
                 encoderStartPos.put(motor, Math.abs(motor.getCurrentPosition()));
-                motor.setPower(motor.getPower() / (percentErrors[i] + 1));
+                motor.setPower(newPower);
             }
+            updateTelemetry();
         }
         return percentErrors;
     }
 
-    public double getPercentError(double rpm, int encoderPpr, DcMotor motor, int waitTime) {
-        double currentRpm = ((Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
+    public double getCurrentRpm(int encoderPpr, DcMotor motor, int waitTime) {
+        return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
+    }
+
+    public double getPercentError(double rpm, double currentRpm) {
         return (currentRpm - rpm) / rpm;
     }
 

@@ -32,9 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -57,8 +55,8 @@ public class TestLauncher extends BaseOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime launcherTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
-    DcMotor leftLaunchMotor;
-    DcMotor rightLaunchMotor;
+    double pos = 0.0;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -67,19 +65,31 @@ public class TestLauncher extends BaseOpMode {
 
         leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
         rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
+        launcherServo = hardwareMap.servo.get("launcherServo");
+        launcherServo.setPosition(0);
 
         waitForStart();
         runtime.reset();
         launcherTime.reset();
         resetEncoders(rightLaunchMotor, leftLaunchMotor);
+        launchMotorsRpm(1500);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             logData("Status", "Run Time: " + runtime.toString());
-            updateTelemetry();
 
-            launchMotorsRpm(1500);
-            sleep(60000);
+            if (gamepad1.y) {
+                if (pos + 0.002 <= 1)
+                    pos += 0.002;
+            } else if (gamepad1.a) {
+                if (pos - 0.002 >= 0)
+                    pos -= 0.002;
+            }
+            logData("position", pos);
+            updateTelemetry();
+            launcherServo.setPosition(pos);
+            sleep(10);
+
 
             // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
             // leftMotor.setPower(-gamepad1.left_stick_y);
@@ -87,6 +97,7 @@ public class TestLauncher extends BaseOpMode {
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
+
     }
 
     public void launchMotorsRpm(double rpm) throws InterruptedException {

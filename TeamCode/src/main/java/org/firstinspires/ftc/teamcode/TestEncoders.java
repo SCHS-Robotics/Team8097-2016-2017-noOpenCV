@@ -40,10 +40,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p>
+ * <p/>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p>
+ * <p/>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
@@ -53,36 +53,56 @@ public class TestEncoders extends AutonomousOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+    double power = 0;
+    int waitTime = 250;
 
     @Override
     public void runOpMode() throws InterruptedException {
         logData("Status", "Initialized");
         updateTelemetry();
 
-        allInit();
+//        allInit();
+        backLeftMotor = hardwareMap.dcMotor.get("motor");
 
         waitForStart();
         runtime.reset();
-        resetWheelEncoders();
+//        resetWheelEncoders();
+        resetEncoders(backLeftMotor);
+        fixRpmTimer.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            logData("Status", "Run Time: " + runtime.toString());
-            updateTelemetry();
+//            logData("Status", "Run Time: " + runtime.toString());
+//            fixRpm(wheelMaxRpm, wheelEncoderPpr, backLeftMotor);
 
-//            goForward(DEFAULT_FORWARD_POWER);
-            logData("backLeft", backLeftMotor.getCurrentPosition());
-            logData("backRight", backRightMotor.getCurrentPosition());
-            logData("frontLeft", frontLeftMotor.getCurrentPosition());
-            logData("frontRight", frontRightMotor.getCurrentPosition());
-            goRightDistance(DEFAULT_SIDEWAYS_POWER, 1);
-            stopRobot();
-            sleep(500000);
+//            goForward(DEFAULT_FORWARD_SPEED);
+//            logData("backLeft", backLeftMotor.getCurrentPosition());
+//            logData("backRight", backRightMotor.getCurrentPosition());
+//            logData("frontLeft", frontLeftMotor.getCurrentPosition());
+//            logData("frontRight", frontRightMotor.getCurrentPosition());
+//            goRightDistance(DEFAULT_SIDEWAYS_SPEED, 1);
+//            stopRobot();
+//            sleep(500000);
+
+            if (gamepad1.y) {
+                if (power + 0.05 <= 1)
+                    power += 0.05;
+            } else if (gamepad1.a) {
+                if (power - 0.05 >= 0)
+                    power -= 0.05;
+            }
 
             // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
             // leftMotor.setPower(-gamepad1.left_stick_y);
-            // rightMotor.setPower(-gamepad1.right_stick_y);
-
+            // rightMotor.setPower(-gamepad1.right_stick_y)
+            // ;
+            encoderStartPos.put(backLeftMotor, Math.abs(backLeftMotor.getCurrentPosition()));
+            backLeftMotor.setPower(power);
+            sleep(waitTime);
+            double currentRpm = ((double) (Math.abs(backLeftMotor.getCurrentPosition()) - encoderStartPos.get(backLeftMotor)) / wheelEncoderPpr) / (waitTime / 60000.0);
+            logData("power", power);
+            logData("rpm", currentRpm);
+            updateTelemetry();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
