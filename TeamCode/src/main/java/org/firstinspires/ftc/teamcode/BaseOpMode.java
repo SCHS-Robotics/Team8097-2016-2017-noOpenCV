@@ -40,8 +40,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     HashMap<DcMotor, Integer> encoderStartPos = new HashMap<>();
     int wheelEncoderPpr = 1680;
     int launcherEncoderPpr = 112;
-    int wheelMaxRpm = 105;
-    double theConstant = 7;
+    int wheelMaxRpm = 103;
+    double theConstant = 9.5;
     int launcherMaxRpm = 1500;//theoretical 1650
     Servo rightFlapServo;
     Servo leftFlapServo;
@@ -125,6 +125,7 @@ public abstract class BaseOpMode extends LinearOpMode {
         if (rpm == 0) {
             return 0;
         }
+        rpm = Math.min(wheelMaxRpm, rpm);
         return -theConstant / (rpm - (wheelMaxRpm + theConstant));
     }
 
@@ -152,8 +153,11 @@ public abstract class BaseOpMode extends LinearOpMode {
                 percentErrors[i] = getPercentError(rpm, currentRpm);
                 double newPower;
                 if (encoderPpr == wheelEncoderPpr) {
+                    logData("percent error " + i, percentErrors[i]);
                     double modifiedRpm = rpm / (percentErrors[i] + 1);
+                    logData("modified rpm " + i, modifiedRpm);
                     newPower = Math.signum(motor.getPower()) * getPowerEstimate(modifiedRpm);
+                    logData("new power " + i, newPower);
                 } else {
                     newPower = motor.getPower() / (percentErrors[i] + 1);
                 }

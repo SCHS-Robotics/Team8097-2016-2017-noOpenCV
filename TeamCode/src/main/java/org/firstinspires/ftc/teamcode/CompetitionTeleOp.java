@@ -82,10 +82,10 @@ public class CompetitionTeleOp extends BaseOpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
         frontRightMotor = hardwareMap.dcMotor.get("frontRight");
 
-        rightFlapServo = hardwareMap.servo.get("rightFlap");
-        leftFlapServo = hardwareMap.servo.get("leftFlap");
-        rightFlapServo.setPosition(rightFlapInitPos);
-        leftFlapServo.setPosition(leftFlapInitPos);
+//        rightFlapServo = hardwareMap.servo.get("rightFlap");
+//        leftFlapServo = hardwareMap.servo.get("leftFlap");
+//        rightFlapServo.setPosition(rightFlapInitPos);
+//        leftFlapServo.setPosition(leftFlapInitPos);
 
         resetPowers();
 
@@ -149,19 +149,19 @@ public class CompetitionTeleOp extends BaseOpMode {
             }
 
             //Button Pushers
-            if (gamepad1.left_bumper) {
-                pushButtonTime.reset();
-                leftFlapServo.setPosition(leftFlapEndPos);
-                rightFlapServo.setPosition(rightFlapInitPos);
-            } else if (gamepad1.right_bumper) {
-                pushButtonTime.reset();
-                rightFlapServo.setPosition(rightFlapEndPos);
-                leftFlapServo.setPosition(leftFlapInitPos);
-            }
-            if (pushButtonTime.time() >= 500) {
-                rightFlapServo.setPosition(rightFlapInitPos);
-                leftFlapServo.setPosition(leftFlapInitPos);
-            }
+//            if (gamepad1.left_bumper) {
+//                pushButtonTime.reset();
+//                leftFlapServo.setPosition(leftFlapEndPos);
+//                rightFlapServo.setPosition(rightFlapInitPos);
+//            } else if (gamepad1.right_bumper) {
+//                pushButtonTime.reset();
+//                rightFlapServo.setPosition(rightFlapEndPos);
+//                leftFlapServo.setPosition(leftFlapInitPos);
+//            }
+//            if (pushButtonTime.time() >= 500) {
+//                rightFlapServo.setPosition(rightFlapInitPos);
+//                leftFlapServo.setPosition(leftFlapInitPos);
+//            }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
