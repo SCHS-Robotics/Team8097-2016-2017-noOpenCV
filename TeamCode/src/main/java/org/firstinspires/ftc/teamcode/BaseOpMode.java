@@ -26,7 +26,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     public final static double TICKS_PER_CM_FORWARD = 53.565;
     public final static double TICKS_PER_CM_SIDEWAYS = 70.304;
     public final static double TICKS_PER_CM_DIAGONAL = 88.348;
-    public final static double TICKS_PER_DEGREE = 10000;//TODO
+    public final static double TICKS_PER_DEGREE = 27.777;
 
     public final static double SERVO_POS_PER_DEGREE = 1.0 / 151.0;
 
@@ -93,8 +93,102 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
     }
 
+    public void stopRobot() {
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+    }
+
+    public void spinRight(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
+    }
+
+    public void spinLeft(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
+    }
+
+    public void goForward(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(-power);
+    }
+
+    public void goBackward(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(power);
+    }
+
+    public void goLeft(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(-power);
+    }
+
+    public void goRight(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
+    }
+
+    public void goDiagonalForwardRight(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(-power);
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(0);
+    }
+
+    public void goDiagonalForwardLeft(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(-power);
+    }
+
+    public void goDiagonalBackwardRight(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(-power);
+        backRightMotor.setPower(0);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(power);
+    }
+
+    public void goDiagonalBackwardLeft(double percentSpeed) {
+        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(power);
+        frontLeftMotor.setPower(-power);
+        frontRightMotor.setPower(0);
+    }
+
     public void resetWheelEncoders() {
         resetEncoders(backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+    }
+
+    public void resetWheelEncoderStartPos() {
+        encoderStartPos.put(backLeftMotor, backLeftMotor.getCurrentPosition());
+        encoderStartPos.put(backRightMotor, backRightMotor.getCurrentPosition());
+        encoderStartPos.put(frontLeftMotor, frontLeftMotor.getCurrentPosition());
+        encoderStartPos.put(frontRightMotor, frontRightMotor.getCurrentPosition());
     }
 
     public void resetLauncherEncoders() {
@@ -122,7 +216,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public double getPowerEstimate(double rpm) {
-        if (rpm == 0) {
+        if (rpm < 10) {
             return 0;
         }
         rpm = Math.min(wheelMaxRpm, rpm);
@@ -154,7 +248,8 @@ public abstract class BaseOpMode extends LinearOpMode {
                 double newPower;
                 if (encoderPpr == wheelEncoderPpr) {
                     logData("percent error " + i, percentErrors[i]);
-                    double modifiedRpm = rpm / (percentErrors[i] + 1);
+                    double expectedRpm = getRpmEstimate(motor.getPower());
+                    double modifiedRpm = expectedRpm / (percentErrors[i] + 1);
                     logData("modified rpm " + i, modifiedRpm);
                     newPower = Math.signum(motor.getPower()) * getPowerEstimate(modifiedRpm);
                     logData("new power " + i, newPower);
@@ -173,8 +268,8 @@ public abstract class BaseOpMode extends LinearOpMode {
         return ((double) (Math.abs(motor.getCurrentPosition()) - encoderStartPos.get(motor)) / encoderPpr) / (waitTime / 60000.0);
     }
 
-    public double getPercentError(double rpm, double currentRpm) {
-        return (currentRpm - rpm) / rpm;
+    public double getPercentError(double goalRpm, double currentRpm) {
+        return (currentRpm - goalRpm) / goalRpm;
     }
 
     public void startLauncher(double rpm) throws InterruptedException {

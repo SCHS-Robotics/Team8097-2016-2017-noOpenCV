@@ -32,9 +32,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -56,21 +59,28 @@ public class CompetitionTeleOp extends BaseOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime pushButtonTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private final int waitTime = 20;
-
-    private int numAverage = 10;//10 averages waiting 20 milliseconds each takes 200 milliseconds.
-    private Double[] backLeftMotorPower = new Double[numAverage];
-    private Double[] backRightMotorPower = new Double[numAverage];
-    private Double[] frontLeftMotorPower = new Double[numAverage];
-    private Double[] frontRightMotorPower = new Double[numAverage];
-    private double backLeftPercentError = 0;
-    private double backRightPercentError = 0;
-    private double frontLeftPercentError = 0;
-    private double frontRightPercentError = 0;
+    final int waitTime = 100;
 
     public static double currentAngle = 90;//initialized in autonomous based on which one is run.
     boolean spun = false;
+    public final static int NONE = -1;
+    public final static int SPIN_RIGHT = 1;
+    public final static int SPIN_LEFT = 2;
+    public final static int RIGHT = 0;
+    public final static int FORWARD_RIGHT = 45;
+    public final static int FORWARD = 90;
+    public final static int FORWARD_LEFT = 135;
+    public final static int LEFT = 180;
+    public final static int BACKWARD_LEFT = 225;
+    public final static int BACKWARD = 270;
+    public final static int BACKWARD_RIGHT = 315;
+    int movement = NONE;
+
+    public final static double MIN_SPEED = 0.25;
+
+    HashMap<DcMotor, Double> percentErrors;
+    double prevRpm;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -82,18 +92,18 @@ public class CompetitionTeleOp extends BaseOpMode {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
         frontRightMotor = hardwareMap.dcMotor.get("frontRight");
 
-//        rightFlapServo = hardwareMap.servo.get("rightFlap");
-//        leftFlapServo = hardwareMap.servo.get("leftFlap");
-//        rightFlapServo.setPosition(rightFlapInitPos);
-//        leftFlapServo.setPosition(leftFlapInitPos);
+        rightFlapServo = hardwareMap.servo.get("rightFlap");
+        leftFlapServo = hardwareMap.servo.get("leftFlap");
+        rightFlapServo.setPosition(rightFlapInitPos);
+        leftFlapServo.setPosition(leftFlapInitPos);
 
-        resetPowers();
+        resetPercentErrors();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
         pushButtonTime.reset();
-        waitTimer.reset();
+        fixRpmTimer.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -101,153 +111,197 @@ public class CompetitionTeleOp extends BaseOpMode {
             updateTelemetry();
 
             //Movement
-            if (waitTimer.time() >= waitTime) {
-                waitTimer.reset();
-                if (backLeftMotorPower[numAverage - 1] != null) {
-                    if (enoughData(backLeftMotorPower))
-                        backLeftPercentError = (getPercentError(averagePower(backLeftMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, backLeftMotor, waitTime * numAverage)) + 1) * (backLeftPercentError + 1) - 1;
-                    if (enoughData(backRightMotorPower))
-                        backRightPercentError = (getPercentError(averagePower(backRightMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, backRightMotor, waitTime * numAverage)) + 1) * (backRightPercentError + 1) - 1;
-                    if (enoughData(frontLeftMotorPower))
-                        frontLeftPercentError = (getPercentError(averagePower(frontLeftMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, frontLeftMotor, waitTime * numAverage)) + 1) * (frontLeftPercentError + 1) - 1;
-                    if (enoughData(frontRightMotorPower))
-                        frontRightPercentError = (getPercentError(averagePower(frontRightMotorPower) * wheelMaxRpm, getCurrentRpm(wheelEncoderPpr, frontRightMotor, waitTime * numAverage)) + 1) * (frontRightPercentError + 1) - 1;
-                    resetPowers();
-                }
-                if (gamepad1.right_trigger > 0.5 || gamepad1.left_trigger > 0.5) {
+            if (fixRpmTimer.time() >= waitTime) {
+                resetWheelEncoderStartPos();
+                fixRpmTimer.reset();
+                if (gamepad1.right_trigger > MIN_SPEED || gamepad1.left_trigger > MIN_SPEED) {
                     if (!spun) {
                         resetWheelEncoders();
-                        waitTimer.reset();
-                        resetPowers();
+                        fixRpmTimer.reset();//resetting the encoders takes time
                     }
-                    if (gamepad1.right_trigger > 0.5) {
-                        spinRight(getPowerEstimateFromPercentSpeed(gamepad1.right_trigger), backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
-                    } else if (gamepad1.left_trigger > 0.5) {
-                        spinLeft(getPowerEstimateFromPercentSpeed(gamepad1.left_trigger), backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    if (gamepad1.right_trigger > MIN_SPEED) {
+                        if (movement != SPIN_RIGHT) {
+                            prevRpm = 0;
+                            resetPercentErrors();
+                            spinRight(gamepad1.right_trigger);
+                        } else {
+                            fixRpmTeleOp(Math.abs(gamepad1.right_trigger) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+                        }
+                        movement = SPIN_RIGHT;
+                    } else if (gamepad1.left_trigger > MIN_SPEED) {
+                        if (movement != SPIN_LEFT) {
+                            prevRpm = 0;
+                            resetPercentErrors();
+                            spinLeft(gamepad1.left_trigger);
+                        } else {
+                            fixRpmTeleOp(Math.abs(gamepad1.left_trigger) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+                        }
+                        movement = SPIN_LEFT;
                     }
                     spun = true;
                 } else {
                     if (spun) {
                         double averageTicks = (backLeftMotor.getCurrentPosition() + backRightMotor.getCurrentPosition() + frontLeftMotor.getCurrentPosition() + frontRightMotor.getCurrentPosition()) / 4.0;
                         currentAngle += -averageTicks / TICKS_PER_DEGREE;
-                        resetPowers();
                     }
                     double joystickInputX = gamepad1.left_stick_x;
                     double joystickInputY = -gamepad1.left_stick_y;
                     double magnitude = Math.sqrt(Math.pow(joystickInputX, 2) + Math.pow(joystickInputY, 2));
                     double angle = Math.toDegrees(Math.atan2(joystickInputY, joystickInputX));
                     angle -= (currentAngle - 90);
-                    goDirectionPolar(magnitude, angle, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
+                    if (magnitude > MIN_SPEED) {
+                        goDirection(magnitude, angle);
+                    } else {
+                        stopRobot();
+                        movement = NONE;
+                    }
                     spun = false;
                 }
-                updatePowers();
             }
 
-            if (gamepad1.guide) {
+            if (gamepad1.right_stick_button) {
                 currentAngle = 90;
                 logData("Angle calibrated!", "Angle calibrated!");
             }
 
             //Button Pushers
-//            if (gamepad1.left_bumper) {
-//                pushButtonTime.reset();
-//                leftFlapServo.setPosition(leftFlapEndPos);
-//                rightFlapServo.setPosition(rightFlapInitPos);
-//            } else if (gamepad1.right_bumper) {
-//                pushButtonTime.reset();
-//                rightFlapServo.setPosition(rightFlapEndPos);
-//                leftFlapServo.setPosition(leftFlapInitPos);
-//            }
-//            if (pushButtonTime.time() >= 500) {
-//                rightFlapServo.setPosition(rightFlapInitPos);
-//                leftFlapServo.setPosition(leftFlapInitPos);
-//            }
+            if (gamepad1.left_bumper) {
+                pushButtonTime.reset();
+                leftFlapServo.setPosition(leftFlapEndPos);
+                rightFlapServo.setPosition(rightFlapInitPos);
+            } else if (gamepad1.right_bumper) {
+                pushButtonTime.reset();
+                rightFlapServo.setPosition(rightFlapEndPos);
+                leftFlapServo.setPosition(leftFlapInitPos);
+            }
+            if (pushButtonTime.time() >= 500) {
+                rightFlapServo.setPosition(rightFlapInitPos);
+                leftFlapServo.setPosition(leftFlapInitPos);
+            }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
 
-//    public void goDirectionPolar(double magnitude, double angle) {
-//        double x = magnitude * Math.cos(Math.toRadians(angle));
-//        double y = magnitude * Math.sin(Math.toRadians(angle));
-//        goDirection(x, y);
-//    }
-
-    public void goDirectionPolar(double magnitude, double angle, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        double x = magnitude * Math.cos(Math.toRadians(angle));
-        double y = magnitude * Math.sin(Math.toRadians(angle));
-        goDirection(x, y, backLeftPercentError, backRightPercentError, frontLeftPercentError, frontRightPercentError);
-    }
-
-//    public void goDirection(double x, double y) {
-//        double sqrt2 = Math.sqrt(2);
-//        backLeftMotor.setPower((y - x) / sqrt2);
-//        backRightMotor.setPower((-y - x) / sqrt2);
-//        frontLeftMotor.setPower((y + x) / sqrt2);
-//        frontRightMotor.setPower((-y + x) / sqrt2);
-//    }
-
-    public void goDirection(double x, double y, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        double sqrt2 = Math.sqrt(2);
-        backLeftMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((y - x) / sqrt2), backLeftPercentError));
-        backRightMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((-y - x) / sqrt2), backRightPercentError));
-        frontLeftMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((y + x) / sqrt2), frontLeftPercentError));
-        frontRightMotor.setPower(applyPercentErrorToWheelPower(getPowerEstimateFromPercentSpeed((-y + x) / sqrt2), frontRightPercentError));
-    }
-
-    public void spinRight(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        backLeftMotor.setPower(applyPercentErrorToWheelPower(power, backLeftPercentError));
-        backRightMotor.setPower(applyPercentErrorToWheelPower(power, backRightPercentError));
-        frontLeftMotor.setPower(applyPercentErrorToWheelPower(power, frontLeftPercentError));
-        frontRightMotor.setPower(applyPercentErrorToWheelPower(power, frontRightPercentError));
-    }
-
-    public void spinLeft(double power, double backLeftPercentError, double backRightPercentError, double frontLeftPercentError, double frontRightPercentError) {
-        backLeftMotor.setPower(applyPercentErrorToWheelPower(-power, backLeftPercentError));
-        backRightMotor.setPower(applyPercentErrorToWheelPower(-power, backRightPercentError));
-        frontLeftMotor.setPower(applyPercentErrorToWheelPower(-power, frontLeftPercentError));
-        frontRightMotor.setPower(applyPercentErrorToWheelPower(-power, frontRightPercentError));
-    }
-
-    private void resetPowers() {
-        Arrays.fill(backLeftMotorPower, null);
-        Arrays.fill(backRightMotorPower, null);
-        Arrays.fill(frontLeftMotorPower, null);
-        Arrays.fill(frontRightMotorPower, null);
-        encoderStartPos.put(backLeftMotor, backLeftMotor.getCurrentPosition());
-        encoderStartPos.put(backRightMotor, backRightMotor.getCurrentPosition());
-        encoderStartPos.put(frontLeftMotor, frontLeftMotor.getCurrentPosition());
-        encoderStartPos.put(frontRightMotor, frontRightMotor.getCurrentPosition());
-    }
-
-    private void updatePowers() {
-        for (int i = 0; i < numAverage - 1; i++) {
-            backLeftMotorPower[i + 1] = backLeftMotorPower[i];
-            backRightMotorPower[i + 1] = backRightMotorPower[i];
-            frontLeftMotorPower[i + 1] = frontLeftMotorPower[i];
-            frontRightMotorPower[i + 1] = frontRightMotorPower[i];
-        }
-        backLeftMotorPower[0] = reversePercentErrorOnWheelPower(backLeftMotor.getPower(), backLeftPercentError);
-        backRightMotorPower[0] = reversePercentErrorOnWheelPower(backRightMotor.getPower(), backRightPercentError);
-        frontLeftMotorPower[0] = reversePercentErrorOnWheelPower(frontLeftMotor.getPower(), frontLeftPercentError);
-        frontRightMotorPower[0] = reversePercentErrorOnWheelPower(frontRightMotor.getPower(), frontRightPercentError);
-    }
-
-    private double averagePower(Double[] power) {
-        double average = 0;
-        for (int i = 0; i < numAverage; i++) {
-            average += power[i];
-        }
-        average /= numAverage;
-        return average;
-    }
-
-    private boolean enoughData(Double[] power) {
-        for (int i = 0; i < numAverage; i++) {
-            if (Math.abs(power[i]) < getPowerEstimateFromPercentSpeed(0.5)) {
-                return false;
+    public double goDirection(double magnitude, double angle) throws InterruptedException {
+        if (angleIsNearAngle(angle, RIGHT)) {
+            if (movement != RIGHT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goRight(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
             }
+            movement = RIGHT;
+        } else if (angleIsNearAngle(angle, FORWARD_RIGHT)) {
+            if (movement != FORWARD_RIGHT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goDiagonalForwardRight(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, frontLeftMotor);
+            }
+            movement = FORWARD_RIGHT;
+        } else if (angleIsNearAngle(angle, FORWARD)) {
+            if (movement != FORWARD) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goForward(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            }
+            movement = FORWARD;
+        } else if (angleIsNearAngle(angle, FORWARD_LEFT)) {
+            if (movement != FORWARD_LEFT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goDiagonalForwardLeft(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, frontRightMotor);
+            }
+            movement = FORWARD_LEFT;
+        } else if (angleIsNearAngle(angle, LEFT)) {
+            if (movement != LEFT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goLeft(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            }
+            movement = LEFT;
+        } else if (angleIsNearAngle(angle, BACKWARD_LEFT)) {
+            if (movement != BACKWARD_LEFT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goDiagonalBackwardLeft(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, frontLeftMotor);
+            }
+            movement = BACKWARD_LEFT;
+        } else if (angleIsNearAngle(angle, BACKWARD)) {
+            if (movement != BACKWARD) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goBackward(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
+            }
+            movement = BACKWARD;
+        } else if (angleIsNearAngle(angle, BACKWARD_RIGHT)) {
+            if (movement != BACKWARD_RIGHT) {
+                prevRpm = 0;
+                resetPercentErrors();
+                goDiagonalBackwardRight(magnitude);
+            } else {
+                fixRpmTeleOp(Math.abs(magnitude) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, frontRightMotor);
+            }
+            movement = BACKWARD_RIGHT;
+        } else {
+            stopRobot();
+            movement = NONE;
+            logData("ERROR!!!", "ERROR!!!");
         }
-        return true;
+
+        return angle;
+    }
+
+    public boolean angleIsNearAngle(double angle1, double angle2) {
+        while (angle1 >= 360) {
+            angle1 -= 360;
+        }
+        while (angle1 < 0) {
+            angle1 += 360;
+        }
+        while (angle2 >= 360) {
+            angle2 -= 360;
+        }
+        while (angle2 < 0) {
+            angle2 += 360;
+        }
+        double diff = Math.abs(angle2 - angle1);
+        return diff < 45.0 / 2 || diff > 360 - 45.0 / 2;
+    }
+
+    public void fixRpmTeleOp(double rpm, int encoderPpr, DcMotor... motors) throws InterruptedException {
+        if (prevRpm == 0) {
+            prevRpm = getRpmEstimate(Math.abs(motors[0].getPower()));
+        }
+        for (int i = 0; i < motors.length; i++) {
+            DcMotor motor = motors[i];
+            double currentRpm = getCurrentRpm(encoderPpr, motor, waitTime);
+            percentErrors.put(motor, (percentErrors.get(motor) + 1) * (getPercentError(prevRpm, currentRpm) + 1) - 1);
+            encoderStartPos.put(motor, Math.abs(motor.getCurrentPosition()));
+            double modifiedRpm = rpm / (percentErrors.get(motor) + 1);
+            double newPower = Math.signum(motor.getPower()) * getPowerEstimate(modifiedRpm);
+            motor.setPower(newPower);
+        }
+        prevRpm = rpm;
+    }
+
+    private void resetPercentErrors() {
+        percentErrors.put(backLeftMotor, 0.0);
+        percentErrors.put(backRightMotor, 0.0);
+        percentErrors.put(frontLeftMotor, 0.0);
+        percentErrors.put(frontRightMotor, 0.0);
     }
 }
