@@ -10,7 +10,7 @@ public class CalibrateServos extends BaseOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    double pos1 = 0.0;//0.5
+    double pos1 = 0.5;
     double pos2 = 0.5;
     double pos3 = 0.5;
     double pos4 = 0.5;
@@ -22,13 +22,12 @@ public class CalibrateServos extends BaseOpMode {
         logData("Status", "Initialized");
         updateTelemetry();
 
-//        leftFlapServo = hardwareMap.servo.get("leftFlap");
-//        rightFlapServo = hardwareMap.servo.get("rightFlap");
-//        leftFlapServo.setPosition(0.5);
-//        rightFlapServo.setPosition(0.5);
-
-        servo = hardwareMap.servo.get("servo");
-        servo.setPosition(0);
+        leftFlapServo = hardwareMap.servo.get("leftFlap");
+        rightFlapServo = hardwareMap.servo.get("rightFlap");
+        rangeServo = hardwareMap.servo.get("rangeServo");
+        leftFlapServo.setPosition(0.5);
+        rightFlapServo.setPosition(0.5);
+        rangeServo.setPosition(0.5);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -67,12 +66,12 @@ public class CalibrateServos extends BaseOpMode {
                 if (pos4 - 0.002 >= 0)
                     pos4 -= 0.002;
             }
-//            leftFlapServo.setPosition(pos);
-//            logData("leftFlap", String.valueOf(pos));
-//            rightFlapServo.setPosition(pos2);
-//            logData("rightFlap", String.valueOf(pos2));
-            servo.setPosition(pos1);
-            logData("servo", pos1);
+            leftFlapServo.setPosition(pos1);
+            logData("leftFlap", pos1);
+            rightFlapServo.setPosition(pos2);
+            logData("rightFlap", pos2);
+            rangeServo.setPosition(pos3);
+            logData("rangeServo", pos3);
             sleep(10);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

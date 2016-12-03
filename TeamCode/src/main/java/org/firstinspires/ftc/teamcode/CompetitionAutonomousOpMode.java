@@ -71,11 +71,11 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     public abstract void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException;
 
     public void moveAlongStartWall(double power) {
-        goRight(power);
+        goLeft(power);
     }
 
     public void moveAlongStartWallDistance(double power, double centimeters) throws InterruptedException {
-        goRightDistance(power, centimeters);
+        goLeftDistance(power, centimeters);
     }
 
     public abstract void moveAlongBeaconWall(double power);
@@ -85,26 +85,26 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     //These movements are with respect to the autonomous side of the robot.
     public void moveLeftSideForward(double power) {
-        moveFrontWheelsRight(power);
+        moveBackWheelsLeft(power);
     }
 
     public void moveLeftSideBackward(double power) {
-        moveFrontWheelsLeft(power);
-    }
-
-    public void moveRightSideForward(double power) {
         moveBackWheelsRight(power);
     }
 
+    public void moveRightSideForward(double power) {
+        moveFrontWheelsLeft(power);
+    }
+
     public void moveRightSideBackward(double power) {
-        moveBackWheelsLeft(power);
+        moveFrontWheelsRight(power);
     }
 
     public void findTapeRight() {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goBackward(DEFAULT_FORWARD_SPEED * 0.85);
+            goForward(DEFAULT_FORWARD_SPEED * 0.85);
         }
         stopRobot();
     }
@@ -113,7 +113,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goForward(DEFAULT_FORWARD_SPEED * 0.85);
+            goBackward(DEFAULT_FORWARD_SPEED * 0.85);
         }
         stopRobot();
     }

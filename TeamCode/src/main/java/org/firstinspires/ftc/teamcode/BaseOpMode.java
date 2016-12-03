@@ -42,7 +42,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     int launcherEncoderPpr = 112;
     int wheelMaxRpm = 103;
     double theConstant = 9.5;
-    int launcherMaxRpm = 1500;//theoretical 1650
+    int launcherMaxRpm = 1400;//theoretical 1650
     Servo rightFlapServo;
     Servo leftFlapServo;
     Servo rangeServo;
@@ -64,7 +64,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     double rightFlapInitPos = 0.780;
     double leftFlapEndPos = 0.162;
     double rightFlapEndPos = 0.936;
-    double rangeServoInitPos = 0.460;
+    double rangeServoInitPos = 0.518;
     double launcherServoInitPos = 0;//TODO
 
     ElapsedTime fixRpmTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
@@ -184,13 +184,6 @@ public abstract class BaseOpMode extends LinearOpMode {
         resetEncoders(backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
     }
 
-    public void resetWheelEncoderStartPos() {
-        encoderStartPos.put(backLeftMotor, backLeftMotor.getCurrentPosition());
-        encoderStartPos.put(backRightMotor, backRightMotor.getCurrentPosition());
-        encoderStartPos.put(frontLeftMotor, frontLeftMotor.getCurrentPosition());
-        encoderStartPos.put(frontRightMotor, frontRightMotor.getCurrentPosition());
-    }
-
     public void resetLauncherEncoders() {
         resetEncoders(leftLaunchMotor, rightLaunchMotor);
     }
@@ -221,18 +214,6 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
         rpm = Math.min(wheelMaxRpm, rpm);
         return -theConstant / (rpm - (wheelMaxRpm + theConstant));
-    }
-
-    public double applyPercentErrorToWheelPower(double power, double percentError) {
-        double estimatedRpm = getRpmEstimate(power);
-        double modifiedRpm = estimatedRpm / (percentError + 1);
-        return Math.signum(power) * getPowerEstimate(modifiedRpm);
-    }
-
-    public double reversePercentErrorOnWheelPower(double resultPower, double percentError) {
-        double modifiedRpm = getRpmEstimate(resultPower);
-        double originalEstimatedRpm = modifiedRpm * (percentError + 1);
-        return Math.signum(resultPower) * getPowerEstimate(originalEstimatedRpm);
     }
 
     public double[] fixRpm(double rpm, int encoderPpr, DcMotor... motors) throws InterruptedException {
@@ -278,9 +259,13 @@ public abstract class BaseOpMode extends LinearOpMode {
         leftLaunchMotor.setPower(rpm / launcherMaxRpm);
         rightLaunchMotor.setPower(rpm / launcherMaxRpm);
         boolean done = false;
-        while (!done) {
+        int counter = 0;
+        while (!done && opModeIsActive()) {
             double[] percentErrors = fixRpm(rpm, launcherEncoderPpr, leftLaunchMotor, rightLaunchMotor);
-            done = Math.abs(percentErrors[0]) <= 0.15 && Math.abs(percentErrors[1]) <= 0.15;
+            if (percentErrors[0] != -2) {
+                done = (Math.abs(percentErrors[0]) <= 0.15 && Math.abs(percentErrors[1]) <= 0.15) || (leftLaunchMotor.getPower() == 1 && rightLaunchMotor.getPower() == 1 && percentErrors[0] < 0 && percentErrors[1] < 0 && counter >= 4);
+                counter++;
+            }
         }
     }
 
