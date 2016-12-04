@@ -6,157 +6,134 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 
 public abstract class AutonomousOpMode extends BaseOpMode {
 
-    public void moveBackWheelsLeft(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
-        backLeftMotor.setPower(power);
-        backRightMotor.setPower(power);
+    public void moveBackWheelsLeft(double speed) {
+        backLeftMotor.setPower(speed);
+        backRightMotor.setPower(speed);
         frontLeftMotor.setPower(0);
         frontRightMotor.setPower(0);
     }
 
-    public void moveBackWheelsRight(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
-        backLeftMotor.setPower(-power);
-        backRightMotor.setPower(-power);
+    public void moveBackWheelsRight(double speed) {
+        backLeftMotor.setPower(-speed);
+        backRightMotor.setPower(-speed);
         frontLeftMotor.setPower(0);
         frontRightMotor.setPower(0);
     }
 
-    public void moveFrontWheelsLeft(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+    public void moveFrontWheelsLeft(double speed) {
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
-        frontLeftMotor.setPower(-power);
-        frontRightMotor.setPower(-power);
+        frontLeftMotor.setPower(-speed);
+        frontRightMotor.setPower(-speed);
     }
 
-    public void moveFrontWheelsRight(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+    public void moveFrontWheelsRight(double speed) {
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
-        frontLeftMotor.setPower(power);
-        frontRightMotor.setPower(power);
+        frontLeftMotor.setPower(speed);
+        frontRightMotor.setPower(speed);
     }
 
-    public void moveLeftWheelsForward(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
-        backLeftMotor.setPower(power);
+    public void moveLeftWheelsForward(double speed) {
+        backLeftMotor.setPower(speed);
         backRightMotor.setPower(0);
-        frontLeftMotor.setPower(power);
+        frontLeftMotor.setPower(speed);
         frontRightMotor.setPower(0);
     }
 
-    public void moveLeftWheelsBackward(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
-        backLeftMotor.setPower(-power);
+    public void moveLeftWheelsBackward(double speed) {
+        backLeftMotor.setPower(-speed);
         backRightMotor.setPower(0);
-        frontLeftMotor.setPower(-power);
+        frontLeftMotor.setPower(-speed);
         frontRightMotor.setPower(0);
     }
 
-    public void moveRightWheelsForward(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+    public void moveRightWheelsForward(double speed) {
         backLeftMotor.setPower(0);
-        backRightMotor.setPower(-power);
+        backRightMotor.setPower(-speed);
         frontLeftMotor.setPower(0);
-        frontRightMotor.setPower(-power);
+        frontRightMotor.setPower(-speed);
     }
 
-    public void moveRightWheelsBackward(double percentSpeed) {
-        double power = getPowerEstimateFromPercentSpeed(percentSpeed);
+    public void moveRightWheelsBackward(double speed) {
         backLeftMotor.setPower(0);
-        backRightMotor.setPower(power);
+        backRightMotor.setPower(speed);
         frontLeftMotor.setPower(0);
-        frontRightMotor.setPower(power);
+        frontRightMotor.setPower(speed);
     }
 
-    public void spinRightDegrees(double percentSpeed, double degrees) throws InterruptedException {
+    public void spinRightDegrees(double speed, double degrees) throws InterruptedException {
         resetWheelEncoders();
-        fixRpmTimer.reset();
-        spinRight(percentSpeed);
+        spinRight(speed);
         double totalEncoderTicks = degrees * TICKS_PER_DEGREE;
-        while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            fixRpm(Math.abs(percentSpeed) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
-        }
+        waitForEncoders(totalEncoderTicks);
         stopRobot();
     }
 
-    public void spinLeftDegrees(double percentSpeed, double degrees) throws InterruptedException {
-        spinRightDegrees(-percentSpeed, degrees);
+    public void spinLeftDegrees(double speed, double degrees) throws InterruptedException {
+        spinRightDegrees(-speed, degrees);
     }
 
-    public void goForwardDistance(double percentSpeed, double centimeters) throws InterruptedException {
+    public void goForwardDistance(double speed, double centimeters) throws InterruptedException {
         resetWheelEncoders();
-        fixRpmTimer.reset();
-        goForward(percentSpeed);
+        goForward(speed);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_FORWARD;
-        while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            fixRpm(Math.abs(percentSpeed) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
-        }
+        waitForEncoders(totalEncoderTicks);
         stopRobot();
     }
 
-    public void goBackwardDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goForwardDistance(-percentSpeed, centimeters);
+    private void waitForEncoders(double encoderTicks) throws InterruptedException {
+        while (getFurthestEncoder() < encoderTicks && opModeIsActive()) {
+            sleep(1);
+        }
     }
 
-    public void goRightDistance(double percentSpeed, double centimeters) throws InterruptedException {
+    public void goBackwardDistance(double speed, double centimeters) throws InterruptedException {
+        goForwardDistance(-speed, centimeters);
+    }
+
+    public void goRightDistance(double speed, double centimeters) throws InterruptedException {
         resetWheelEncoders();
-        fixRpmTimer.reset();
-        goRight(percentSpeed);
+        goRight(speed);
         double totalEncoderTicks = centimeters * TICKS_PER_CM_SIDEWAYS;
-        while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            fixRpm(Math.abs(percentSpeed) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, backRightMotor, frontLeftMotor, frontRightMotor);
-            logData("backLeft", String.valueOf(backLeftMotor.getCurrentPosition()));
-            logData("backRight", String.valueOf(backRightMotor.getCurrentPosition()));
-            logData("frontLeft", String.valueOf(frontLeftMotor.getCurrentPosition()));
-            logData("frontRight", String.valueOf(frontRightMotor.getCurrentPosition()));
-            updateTelemetry();
-        }
+        waitForEncoders(totalEncoderTicks);
         stopRobot();
     }
 
-    public void goLeftDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goRightDistance(-percentSpeed, centimeters);
+    public void goLeftDistance(double speed, double centimeters) throws InterruptedException {
+        goRightDistance(-speed, centimeters);
     }
 
-    private void goDiagonalDistance(double percentSpeed, double centimeters, int forward, int sideways) throws InterruptedException {
+    private void goDiagonalDistance(double speed, double centimeters, int forward, int sideways) throws InterruptedException {
         resetWheelEncoders();
-        fixRpmTimer.reset();
         if (forward == 1 && sideways == 1) {
-            goDiagonalForwardRight(percentSpeed);
+            goDiagonalForwardRight(speed);
         } else if (forward == 1 && sideways == -1) {
-            goDiagonalForwardLeft(percentSpeed);
+            goDiagonalForwardLeft(speed);
         } else if (forward == -1 && sideways == 1) {
-            goDiagonalBackwardRight(percentSpeed);
+            goDiagonalBackwardRight(speed);
         } else if (forward == -1 && sideways == -1) {
-            goDiagonalBackwardLeft(percentSpeed);
+            goDiagonalBackwardLeft(speed);
         }
         double totalEncoderTicks = centimeters * TICKS_PER_CM_DIAGONAL;
-        while (getFurthestEncoder() < totalEncoderTicks && opModeIsActive()) {
-            if ((forward == 1 && sideways == 1) || (forward == -1 && sideways == -1)) {
-                fixRpm(Math.abs(percentSpeed) * wheelMaxRpm, wheelEncoderPpr, backRightMotor, frontLeftMotor);
-            } else if ((forward == 1 && sideways == -1) || (forward == -1 && sideways == 1)) {
-                fixRpm(Math.abs(percentSpeed) * wheelMaxRpm, wheelEncoderPpr, backLeftMotor, frontRightMotor);
-            }
-        }
+        waitForEncoders(totalEncoderTicks);
         stopRobot();
     }
 
-    public void goDiagonalForwardRightDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goDiagonalDistance(percentSpeed, centimeters, 1, 1);
+    public void goDiagonalForwardRightDistance(double speed, double centimeters) throws InterruptedException {
+        goDiagonalDistance(speed, centimeters, 1, 1);
     }
 
-    public void goDiagonalForwardLeftDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goDiagonalDistance(percentSpeed, centimeters, 1, -1);
+    public void goDiagonalForwardLeftDistance(double speed, double centimeters) throws InterruptedException {
+        goDiagonalDistance(speed, centimeters, 1, -1);
     }
 
-    public void goDiagonalBackwardRightDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goDiagonalDistance(percentSpeed, centimeters, -1, 1);
+    public void goDiagonalBackwardRightDistance(double speed, double centimeters) throws InterruptedException {
+        goDiagonalDistance(speed, centimeters, -1, 1);
     }
 
-    public void goDiagonalBackwardLeftDistance(double percentSpeed, double centimeters) throws InterruptedException {
-        goDiagonalDistance(percentSpeed, centimeters, -1, -1);
+    public void goDiagonalBackwardLeftDistance(double speed, double centimeters) throws InterruptedException {
+        goDiagonalDistance(speed, centimeters, -1, -1);
     }
 
     public int getFurthestEncoder() {
@@ -210,7 +187,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         for (int i = 0; i < numReads; i++) {
             double pos = startPos + (angleIncrement * SERVO_POS_PER_DEGREE * i);
             rangeServo.setPosition(pos);
-            sleep(100);
+            sleep(1000);
             int ultrasonic = rangeSensor.rawUltrasonic();
             logData("distance", ultrasonic);
             updateTelemetry();
@@ -222,6 +199,6 @@ public abstract class AutonomousOpMode extends BaseOpMode {
             }
         }
         rangeServo.setPosition(rangeServoInitPos);
-        return (((lastMinPos + firstMinPos) / 2) - 0.5) / SERVO_POS_PER_DEGREE;//TODO + or - ???
+        return -(((lastMinPos + firstMinPos) / 2) - 0.5) / SERVO_POS_PER_DEGREE;
     }
 }

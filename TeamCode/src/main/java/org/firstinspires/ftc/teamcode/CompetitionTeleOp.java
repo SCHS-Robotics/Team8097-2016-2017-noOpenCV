@@ -24,33 +24,19 @@ public class CompetitionTeleOp extends BaseOpMode {
 
     public final static double MIN_SPEED = 0;
 
-    boolean launcherOn = false;
-
     @Override
     public void runOpMode() throws InterruptedException {
         logData("Status", "Initialized");
         updateTelemetry();
 
-        backLeftMotor = hardwareMap.dcMotor.get("backLeft");
-        backRightMotor = hardwareMap.dcMotor.get("backRight");
-        frontLeftMotor = hardwareMap.dcMotor.get("frontLeft");
-        frontRightMotor = hardwareMap.dcMotor.get("frontRight");
-
-        rightFlapServo = hardwareMap.servo.get("rightFlap");
-        leftFlapServo = hardwareMap.servo.get("leftFlap");
-        rightFlapServo.setPosition(rightFlapInitPos);
-        leftFlapServo.setPosition(leftFlapInitPos);
-
-        leftLaunchMotor = hardwareMap.dcMotor.get("leftLaunch");
-        rightLaunchMotor = hardwareMap.dcMotor.get("rightLaunch");
-        leftLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        initWheels();
+        initLauncher();
+        initButtons();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
         pushButtonTime.reset();
-        fixRpmTimer.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -107,14 +93,11 @@ public class CompetitionTeleOp extends BaseOpMode {
             }
 
             if (gamepad1.a) {
-                if (!launcherOn) {
-                    startLauncher(launcherMaxRpm);
-                    launcherOn = true;
-                } else {
-                    leftLaunchMotor.setPower(0);
-                    rightLaunchMotor.setPower(0);
-                    launcherOn = false;
-                }
+                leftLaunchMotor.setPower(1);
+                rightLaunchMotor.setPower(1);
+            } else if (gamepad1.b) {
+                leftLaunchMotor.setPower(0);
+                rightLaunchMotor.setPower(0);
             }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

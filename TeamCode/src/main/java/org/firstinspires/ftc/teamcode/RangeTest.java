@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorImpl;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
@@ -10,7 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.HashMap;
 
 @Autonomous(name = "Range Test", group = "Test")
-public class RangeTest extends BaseOpMode {
+public class RangeTest extends AutonomousOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
@@ -55,33 +59,5 @@ public class RangeTest extends BaseOpMode {
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
-    }
-
-    public double determineAngleOffset() throws InterruptedException {
-        double angleWindow = 60;
-        double startPos = rangeServoInitPos - ((angleWindow / 2) * SERVO_POS_PER_DEGREE);
-        double angleIncrement = 2;
-        int numReads = (int) Math.round(angleWindow / angleIncrement);
-        int[] distances = new int[numReads];
-        int minDistance = 255;
-        double firstMinPos = 0;
-        double lastMinPos = 1;
-        for (int i = 0; i < numReads; i++) {
-            double pos = startPos + (angleIncrement * SERVO_POS_PER_DEGREE * i);
-            rangeServo.setPosition(pos);
-            sleep(100);
-            int ultrasonic = rangeSensor.rawUltrasonic();
-            logData("distance", ultrasonic);
-            updateTelemetry();
-            distances[i] = ultrasonic;
-            if (ultrasonic < minDistance) {
-                minDistance = ultrasonic;
-                firstMinPos = pos;
-            } else if (ultrasonic == minDistance) {
-                lastMinPos = pos;
-            }
-        }
-        rangeServo.setPosition(((lastMinPos + firstMinPos) / 2));
-        return (((lastMinPos + firstMinPos) / 2) - 0.5) / SERVO_POS_PER_DEGREE;
     }
 }

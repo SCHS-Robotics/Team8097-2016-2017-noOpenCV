@@ -7,8 +7,9 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
 
-    final double closeToWallDistance = 30;//centimeters
-    final double buttonPushingDistance = 10;//centimeters
+    final int closeToWallDistance = 30;//centimeters
+    final int beforePushingButtonDistance = 18;//centimeters
+    final int pushingButtonDistance = 12;//centimeters
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,47 +22,41 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        boolean run = true;
-        while (opModeIsActive()) {
-            if (run) {
-                moveAcrossFieldDistance(DEFAULT_DIAGONAL_SPEED, 95 * Math.sqrt(2));
-                while (getRangeDistance() > closeToWallDistance && opModeIsActive()) {
-                    moveAlongStartWall(DEFAULT_SIDEWAYS_SPEED * 0.8);
-                    logData("sensor distance", getRangeDistance());
-                    updateTelemetry();
-                }
-                stopRobot();
-                findTapeInward();
-                alignWithWall();
-                pushCorrectButton();
-                moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 90);
-                findTapeInward();
-                alignWithWall();
-                pushCorrectButton();
-                run = false;
-            }
+        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
+        moveAlongStartWallDistance(DEFAULT_SIDEWAYS_SPEED, 102.0 / 2);
+        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
+        goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
+        stopRobot();
+        findTapeInward();
+        alignWithWall();
+        moveCorrectButtonFlap();
+        pushButton();
+        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 90);
+        findTapeInward();
+        alignWithWall();
+        moveCorrectButtonFlap();
+        pushButton();
 
+        while (opModeIsActive()) {
             idle();
+        }
+    }
+
+    public void goToBeaconWall(double speed, int cmFromWall) throws InterruptedException {
+        sleep(100);
+        while (getRangeDistance() > cmFromWall && opModeIsActive()) {
+            moveAlongStartWall(speed);
         }
     }
 
     public void alignWithWall() throws InterruptedException {
         double angleOffset = determineAngleOffset();
         if (angleOffset > 2) {
-            spinRightDegrees(DEFAULT_SPIN_SPEED, angleOffset);
+            spinRightDegrees(DEFAULT_SPIN_SPEED * 0.25, angleOffset);
         } else if (angleOffset < -2) {
-            spinLeftDegrees(DEFAULT_SPIN_SPEED, -angleOffset);
+            spinLeftDegrees(DEFAULT_SPIN_SPEED * 0.25, -angleOffset);
         }
-        sleep(100);
-        if (getRangeDistance() > buttonPushingDistance) {
-            while (getRangeDistance() > buttonPushingDistance) {
-                moveAlongStartWall(DEFAULT_SIDEWAYS_SPEED * 0.8);
-            }
-        } else if (getRangeDistance() < buttonPushingDistance) {
-            while (getRangeDistance() < buttonPushingDistance) {
-                moveAlongStartWall(-DEFAULT_SIDEWAYS_SPEED * 0.8);
-            }
-        }
+        goToBeaconWall(DEFAULT_SIDEWAYS_SPEED * 0.25, beforePushingButtonDistance);
         stopRobot();
     }
 
@@ -100,29 +95,42 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         moveFrontWheelsRight(power);
     }
 
-    public void findTapeRight() {
+    public void findTapeRight() throws InterruptedException {
+        sleep(100);
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goForward(DEFAULT_FORWARD_SPEED * 0.85);
+            goForward(DEFAULT_FORWARD_SPEED * 0.25);
         }
         stopRobot();
     }
 
-    public void findTapeLeft() {
+    public void findTapeLeft() throws InterruptedException {
+        sleep(100);
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goBackward(DEFAULT_FORWARD_SPEED * 0.85);
+            goBackward(DEFAULT_FORWARD_SPEED * 0.25);
         }
         stopRobot();
     }
 
-    public abstract void findTapeInward();
+    public abstract void findTapeInward() throws InterruptedException;
 
-    public abstract void findTapeOutward();
+    public abstract void findTapeOutward() throws InterruptedException;
 
-    public abstract void pushCorrectButton() throws InterruptedException;
+    public abstract void moveCorrectButtonFlap() throws InterruptedException;
+
+    public void pushButton() throws InterruptedException {
+        goToBeaconWall(DEFAULT_SIDEWAYS_SPEED * 0.5, pushingButtonDistance);
+        moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 10);
+        resetButtonFlaps();
+    }
+
+    public void resetButtonFlaps() {
+        leftFlapServo.setPosition(leftFlapInitPos);
+        rightFlapServo.setPosition(rightFlapInitPos);
+    }
 
     public void loadTapeValues() {
         frontTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -1000)) / 2.0;

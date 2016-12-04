@@ -36,17 +36,17 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void findTapeInward() {
+    public void findTapeInward() throws InterruptedException {
         findTapeLeft();
     }
 
     @Override
-    public void findTapeOutward() {
+    public void findTapeOutward() throws InterruptedException {
         findTapeRight();
     }
 
     @Override
-    public void pushCorrectButton() throws InterruptedException {
+    public void moveCorrectButtonFlap() throws InterruptedException {
         int[] colors = getAverageColor(leftColorSensor, rightColorSensor);
         int leftColor = colors[0];
         int rightColor = colors[1];
@@ -61,8 +61,5 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
             rightFlapServo.setPosition(rightFlapEndPos);
             leftFlapServo.setPosition(leftFlapInitPos);
         }
-        sleep(500);
-        rightFlapServo.setPosition(rightFlapInitPos);
-        leftFlapServo.setPosition(leftFlapInitPos);
     }
 }
