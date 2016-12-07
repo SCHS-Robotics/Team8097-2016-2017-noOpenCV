@@ -22,7 +22,13 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
+        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);//TODO Keep this here or in between shooting and spinning?
+        if (shouldShoot()) {
+            shoot();
+        }
+        if (shouldShoot()) {
+            fixPosAfterShooting();
+        }
         moveAlongStartWallDistance(DEFAULT_SIDEWAYS_SPEED, 102.0 / 2);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
@@ -37,11 +43,20 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
+        setTeleOpAngle();
 
         while (opModeIsActive()) {
             idle();
         }
     }
+
+    public abstract boolean shouldShoot();
+
+    public void shoot() {
+        //TODO
+    }
+
+    public abstract void fixPosAfterShooting() throws InterruptedException;
 
     public void goToBeaconWall(double speed, int cmFromWall) throws InterruptedException {
         sleep(250);
@@ -77,7 +92,6 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     public abstract void moveAlongBeaconWall(double power);
 
     public abstract void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException;
-
 
     //These movements are with respect to the autonomous side of the robot.
     public void moveLeftSideForward(double power) {
@@ -132,6 +146,8 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         leftFlapServo.setPosition(leftFlapInitPos);
         rightFlapServo.setPosition(rightFlapInitPos);
     }
+
+    public abstract void setTeleOpAngle();
 
     public void loadTapeValues() {
         frontTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -1000)) / 2.0;

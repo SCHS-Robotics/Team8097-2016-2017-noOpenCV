@@ -10,9 +10,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        super.runOpMode();
-        CompetitionTeleOp.currentAngle = 270;
+    public boolean shouldShoot() {
+        return false;
+    }
+
+    @Override
+    public void fixPosAfterShooting() {
+        //Do nothing
     }
 
     @Override
@@ -61,5 +65,10 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
             rightFlapServo.setPosition(rightFlapEndPos);
             leftFlapServo.setPosition(leftFlapInitPos);
         }
+    }
+
+    @Override
+    public void setTeleOpAngle() {
+        CompetitionTeleOp.currentAngle = 270;
     }
 }
