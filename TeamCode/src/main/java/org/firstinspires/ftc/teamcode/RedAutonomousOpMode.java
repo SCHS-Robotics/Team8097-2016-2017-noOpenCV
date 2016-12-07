@@ -60,6 +60,9 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
         } else if (rightRed > leftRed && rightBlue < leftBlue) {
             rightFlapServo.setPosition(rightFlapEndPos);
             leftFlapServo.setPosition(leftFlapInitPos);
+        } else { //testing without working beacon only
+            rightFlapServo.setPosition(rightFlapEndPos);
+            leftFlapServo.setPosition(leftFlapInitPos);
         }
     }
 }

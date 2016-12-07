@@ -44,6 +44,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     Servo leftFlapServo;
     Servo rangeServo;
     Servo launcherServo;
+    Servo leftLiftServo;
+    Servo rightLiftServo;
     ColorSensor rightColorSensor;
     ColorSensor leftColorSensor;
     ColorSensor frontTapeSensor;
@@ -63,6 +65,10 @@ public abstract class BaseOpMode extends LinearOpMode {
     double rightFlapEndPos = 0.690;
     double rangeServoInitPos = 0.518;
     double launcherServoInitPos = 0;//TODO
+    double leftLiftInitPos = 0.636;
+    double rightLiftInitPos = 0.210;
+    double leftLiftEndPos = 0.244; //0.324
+    double rightLiftEndPos = 0.608; //0.494
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 
@@ -207,6 +213,10 @@ public abstract class BaseOpMode extends LinearOpMode {
 
         launcherServo = hardwareMap.servo.get("launcherServo");
         launcherServo.setPosition(launcherServoInitPos);
+        leftLiftServo = hardwareMap.servo.get("leftLift");
+        rightLiftServo = hardwareMap.servo.get("rightLift");
+        leftLiftServo.setPosition(leftLiftInitPos);
+        rightLiftServo.setPosition(rightLiftInitPos);
     }
 
     public void initCollection() {

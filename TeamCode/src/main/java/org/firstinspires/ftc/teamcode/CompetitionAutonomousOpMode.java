@@ -31,6 +31,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
+        sleep(100000);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 90);
         findTapeInward();
         alignWithWall();
@@ -43,7 +44,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     }
 
     public void goToBeaconWall(double speed, int cmFromWall) throws InterruptedException {
-        sleep(100);
+        sleep(250);
         while (getRangeDistance() > cmFromWall && opModeIsActive()) {
             moveAlongStartWall(speed);
         }
@@ -52,11 +53,11 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     public void alignWithWall() throws InterruptedException {
         double angleOffset = determineAngleOffset();
         if (angleOffset > 2) {
-            spinRightDegrees(DEFAULT_SPIN_SPEED * 0.25, angleOffset);
+            spinRightDegrees(0.25, angleOffset);
         } else if (angleOffset < -2) {
-            spinLeftDegrees(DEFAULT_SPIN_SPEED * 0.25, -angleOffset);
+            spinLeftDegrees(0.25, -angleOffset);
         }
-        goToBeaconWall(DEFAULT_SIDEWAYS_SPEED * 0.25, beforePushingButtonDistance);
+        goToBeaconWall(0.25, beforePushingButtonDistance);
         stopRobot();
     }
 
@@ -96,21 +97,21 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     }
 
     public void findTapeRight() throws InterruptedException {
-        sleep(100);
+        sleep(250);
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goForward(DEFAULT_FORWARD_SPEED * 0.25);
+            goForward(0.25);
         }
         stopRobot();
     }
 
     public void findTapeLeft() throws InterruptedException {
-        sleep(100);
+        sleep(250);
         while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
             logData("light", frontTapeSensor.alpha());
             updateTelemetry();
-            goBackward(DEFAULT_FORWARD_SPEED * 0.25);
+            goBackward(0.25);
         }
         stopRobot();
     }
@@ -122,7 +123,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
     public abstract void moveCorrectButtonFlap() throws InterruptedException;
 
     public void pushButton() throws InterruptedException {
-        goToBeaconWall(DEFAULT_SIDEWAYS_SPEED * 0.5, pushingButtonDistance);
+        goToBeaconWall(0.5, pushingButtonDistance);
         moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 10);
         resetButtonFlaps();
     }

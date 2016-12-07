@@ -9,6 +9,7 @@ public class CompetitionTeleOp extends BaseOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime pushButtonTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private ElapsedTime liftTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     final int waitTime = 100;
 
     public static double currentAngle = 90;//initialized in autonomous based on which one is run.
@@ -24,19 +25,20 @@ public class CompetitionTeleOp extends BaseOpMode {
 
     public final static double MIN_SPEED = 0;
 
+    boolean prevA = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         logData("Status", "Initialized");
         updateTelemetry();
 
-        initWheels();
-        initLauncher();
-        initButtons();
+        allInit();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
         pushButtonTime.reset();
+        liftTime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -92,12 +94,27 @@ public class CompetitionTeleOp extends BaseOpMode {
                 leftFlapServo.setPosition(leftFlapInitPos);
             }
 
-            if (gamepad1.a) {
-                leftLaunchMotor.setPower(1);
-                rightLaunchMotor.setPower(1);
-            } else if (gamepad1.b) {
-                leftLaunchMotor.setPower(0);
-                rightLaunchMotor.setPower(0);
+            if (gamepad1.a && !prevA) {
+                if (leftLaunchMotor.getPower() == 0) {
+                    leftLaunchMotor.setPower(-1);
+                    rightLaunchMotor.setPower(1);
+                } else {
+                    leftLaunchMotor.setPower(0);
+                    rightLaunchMotor.setPower(0);
+                }
+                prevA = true;
+            } else if (!gamepad1.a && prevA) {
+                prevA = false;
+            }
+
+            if (gamepad1.b) {
+                liftTime.reset();
+                leftLiftServo.setPosition(leftLiftEndPos);
+                rightLiftServo.setPosition(rightLiftEndPos);
+            }
+            if (liftTime.time() >= 500) {
+                leftLiftServo.setPosition(leftLiftInitPos);
+                rightLiftServo.setPosition(rightLiftInitPos);
             }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

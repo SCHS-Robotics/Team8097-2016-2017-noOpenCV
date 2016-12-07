@@ -187,7 +187,7 @@ public abstract class AutonomousOpMode extends BaseOpMode {
         for (int i = 0; i < numReads; i++) {
             double pos = startPos + (angleIncrement * SERVO_POS_PER_DEGREE * i);
             rangeServo.setPosition(pos);
-            sleep(1000);
+            sleep(100);
             int ultrasonic = rangeSensor.rawUltrasonic();
             logData("distance", ultrasonic);
             updateTelemetry();
