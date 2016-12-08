@@ -96,11 +96,9 @@ public class CompetitionTeleOp extends BaseOpMode {
 
             if (gamepad1.a && !prevA) {
                 if (leftLaunchMotor.getPower() == 0) {
-                    leftLaunchMotor.setPower(-1);
-                    rightLaunchMotor.setPower(1);
+                    startLauncher();
                 } else {
-                    leftLaunchMotor.setPower(0);
-                    rightLaunchMotor.setPower(0);
+                    stopLauncher();
                 }
                 prevA = true;
             } else if (!gamepad1.a && prevA) {
@@ -125,7 +123,6 @@ public class CompetitionTeleOp extends BaseOpMode {
                 if (pos - 0.002 >= 0)
                     pos -= 0.002;
             }
-
             logData("position", pos);
             updateTelemetry();
             launcherServo.setPosition(pos);

@@ -22,12 +22,12 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);//TODO Keep this here or in between shooting and spinning?
         if (shouldShoot()) {
             shoot();
-        }
-        if (shouldShoot()) {
+            goBackwardDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
             fixPosAfterShooting();
+        } else {
+            moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
         }
         moveAlongStartWallDistance(DEFAULT_SIDEWAYS_SPEED, 102.0 / 2);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
@@ -51,8 +51,22 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     public abstract boolean shouldShoot();
 
-    public void shoot() {
-        //TODO
+    public abstract int numParticles();
+
+    public void shoot() throws InterruptedException {
+        startLauncher();
+        sleep(500);
+        for (int i = 0; i < numParticles(); i++) {
+            leftLiftServo.setPosition(leftLiftEndPos);
+            rightLiftServo.setPosition(rightLiftEndPos);
+            sleep(500);
+            leftLiftServo.setPosition(leftLiftInitPos);
+            rightLiftServo.setPosition(rightLiftInitPos);
+            if (i < numParticles() - 1) {
+                sleep(500);
+            }
+        }
+        stopLauncher();
     }
 
     public abstract void fixPosAfterShooting() throws InterruptedException;

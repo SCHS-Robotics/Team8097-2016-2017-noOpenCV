@@ -15,6 +15,11 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
+    public int numParticles() {
+        return 0;
+    }
+
+    @Override
     public void fixPosAfterShooting() {
         //Do nothing
     }

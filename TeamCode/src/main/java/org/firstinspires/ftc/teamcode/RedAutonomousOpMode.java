@@ -15,6 +15,11 @@ public class RedAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
+    public int numParticles() {
+        return 0;
+    }
+
+    @Override
     public void fixPosAfterShooting() throws InterruptedException {
         spinRightDegrees(DEFAULT_SPIN_SPEED, 180);
     }

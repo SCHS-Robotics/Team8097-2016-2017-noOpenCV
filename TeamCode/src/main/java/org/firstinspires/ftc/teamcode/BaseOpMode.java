@@ -96,6 +96,16 @@ public abstract class BaseOpMode extends LinearOpMode {
         }
     }
 
+    public void startLauncher() {
+        leftLaunchMotor.setPower(-1);
+        rightLaunchMotor.setPower(1);
+    }
+
+    public void stopLauncher() {
+        leftLaunchMotor.setPower(0);
+        rightLaunchMotor.setPower(0);
+    }
+
     public void stopRobot() {
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
