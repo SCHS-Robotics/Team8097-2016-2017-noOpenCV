@@ -32,15 +32,14 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         moveAlongStartWallDistance(DEFAULT_SIDEWAYS_SPEED, 102.0 / 2);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
-        stopRobot();
         findTapeInward();
-        alignWithWall();
+//        alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
         sleep(100000);
-        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 90);
+        moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
-        alignWithWall();
+//        alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
         setTeleOpAngle();
@@ -63,7 +62,17 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
         while (getRangeDistance() > cmFromWall && opModeIsActive()) {
             moveAlongStartWall(speed);
         }
+        stopRobot();
     }
+
+    public void goAwayFromBeaconWall(double speed, int cmFromWall) throws InterruptedException {
+        sleep(250);
+        while (getRangeDistance() < cmFromWall && opModeIsActive()) {
+            moveAlongStartWall(-speed);
+        }
+        stopRobot();
+    }
+
 
     public void alignWithWall() throws InterruptedException {
         double angleOffset = determineAngleOffset();
@@ -138,7 +147,7 @@ public abstract class CompetitionAutonomousOpMode extends AutonomousOpMode {
 
     public void pushButton() throws InterruptedException {
         goToBeaconWall(0.5, pushingButtonDistance);
-        moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 10);
+        goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
         resetButtonFlaps();
     }
 

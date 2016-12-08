@@ -27,6 +27,8 @@ public class CompetitionTeleOp extends BaseOpMode {
 
     boolean prevA = false;
 
+    double pos = launcherServoInitPos;
+
     @Override
     public void runOpMode() throws InterruptedException {
         logData("Status", "Initialized");
@@ -42,8 +44,6 @@ public class CompetitionTeleOp extends BaseOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            logData("Status", "Run Time: " + runtime.toString());
-            updateTelemetry();
 
             //Movement
             if (gamepad1.right_trigger > MIN_SPEED || gamepad1.left_trigger > MIN_SPEED) {
@@ -107,7 +107,7 @@ public class CompetitionTeleOp extends BaseOpMode {
                 prevA = false;
             }
 
-            if (gamepad1.b) {
+            if (gamepad1.b && leftLaunchMotor.getPower() != 0) {
                 liftTime.reset();
                 leftLiftServo.setPosition(leftLiftEndPos);
                 rightLiftServo.setPosition(rightLiftEndPos);
@@ -116,6 +116,19 @@ public class CompetitionTeleOp extends BaseOpMode {
                 leftLiftServo.setPosition(leftLiftInitPos);
                 rightLiftServo.setPosition(rightLiftInitPos);
             }
+
+            //Launcher Testing
+            if (gamepad1.dpad_down) {
+                if (pos + 0.002 <= 1)
+                    pos += 0.002;
+            } else if (gamepad1.dpad_up) {
+                if (pos - 0.002 >= 0)
+                    pos -= 0.002;
+            }
+
+            logData("position", pos);
+            updateTelemetry();
+            launcherServo.setPosition(pos);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }

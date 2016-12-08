@@ -10,8 +10,8 @@ public class CalibrateServos extends BaseOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    double pos1 = 0.5;
-    double pos2 = 0.5;
+    double pos1 = leftFlapInitPos;
+    double pos2 = rightFlapInitPos;
     double pos3 = 0.5;
     double pos4 = 0.5;
 
@@ -61,12 +61,12 @@ public class CalibrateServos extends BaseOpMode {
                 if (pos4 - 0.002 >= 0)
                     pos4 -= 0.002;
             }
-            leftLiftServo.setPosition(pos1);
-            logData("leftLift", pos1);
-            rightLiftServo.setPosition(pos2);
-            logData("rightLift", pos2);
-            launcherServo.setPosition(pos3);
-            logData("launcher", pos3);
+            leftFlapServo.setPosition(pos1);
+            logData("leftFlap", pos1);
+            rightFlapServo.setPosition(pos2);
+            logData("rightFlap", pos2);
+//            launcherServo.setPosition(pos3);
+//            logData("launcher", pos3);
             sleep(10);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

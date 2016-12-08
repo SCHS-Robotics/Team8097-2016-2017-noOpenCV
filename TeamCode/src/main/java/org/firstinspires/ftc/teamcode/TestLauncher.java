@@ -9,6 +9,9 @@ public class TestLauncher extends BaseOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime launcherTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private ElapsedTime liftTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+    boolean prevA = false;
 
     double pos = 0.0;
 
@@ -26,6 +29,7 @@ public class TestLauncher extends BaseOpMode {
         waitForStart();
         runtime.reset();
         launcherTime.reset();
+        liftTime.reset();
         resetEncoders(rightLaunchMotor, leftLaunchMotor);
         launchMotorsRpm(1400);
 
@@ -33,13 +37,37 @@ public class TestLauncher extends BaseOpMode {
         while (opModeIsActive()) {
             logData("Status", "Run Time: " + runtime.toString());
 
-            if (gamepad1.y) {
+            if (gamepad1.dpad_down) {
                 if (pos + 0.002 <= 1)
                     pos += 0.002;
-            } else if (gamepad1.a) {
+            } else if (gamepad1.dpad_up) {
                 if (pos - 0.002 >= 0)
                     pos -= 0.002;
             }
+
+            if (gamepad1.a && !prevA) {
+                if (leftLaunchMotor.getPower() == 0) {
+                    leftLaunchMotor.setPower(-1);
+                    rightLaunchMotor.setPower(1);
+                } else {
+                    leftLaunchMotor.setPower(0);
+                    rightLaunchMotor.setPower(0);
+                }
+                prevA = true;
+            } else if (!gamepad1.a && prevA) {
+                prevA = false;
+            }
+
+            if (gamepad1.b) {
+                liftTime.reset();
+                leftLiftServo.setPosition(leftLiftEndPos);
+                rightLiftServo.setPosition(rightLiftEndPos);
+            }
+            if (liftTime.time() >= 500) {
+                leftLiftServo.setPosition(leftLiftInitPos);
+                rightLiftServo.setPosition(rightLiftInitPos);
+            }
+
             logData("position", pos);
             updateTelemetry();
             launcherServo.setPosition(pos);
