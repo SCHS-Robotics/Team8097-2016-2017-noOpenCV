@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Red Shoot 1 Autonomous", group = "OpMode")
-public class RedShootAutonomous extends RedAutonomousOpMode {
+@Autonomous(name = "Blue Beacons Shoot 1 Autonomous", group = "OpMode")
+public class BlueBeaconsShootAutonomous extends BlueBeaconsAutonomous {
     @Override
     public boolean shouldShoot() {
         return true;

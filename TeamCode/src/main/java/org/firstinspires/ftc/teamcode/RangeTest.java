@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
-import com.qualcomm.robotcore.hardware.DcMotorImpl;
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
-import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.HashMap;
-
-@Autonomous(name = "Range Test", group = "Test")
-public class RangeTest extends AutonomousOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Range Test", group = "Test")
+public class RangeTest extends Autonomous {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);

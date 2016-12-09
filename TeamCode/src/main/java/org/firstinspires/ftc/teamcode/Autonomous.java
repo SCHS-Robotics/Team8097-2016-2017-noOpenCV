@@ -4,7 +4,7 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-public abstract class AutonomousOpMode extends BaseOpMode {
+public abstract class Autonomous extends BaseOpMode {
 
     public void moveBackWheelsLeft(double speed) {
         backLeftMotor.setPower(speed);

@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "Blue Autonomous", group = "OpMode")
-public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
+@Autonomous(name = "Red Beacons Autonomous", group = "OpMode")
+public class RedBeaconsAutonomous extends BeaconsAutonomous {
 
     @Override
     public boolean shouldShoot() {
@@ -20,38 +18,38 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
     }
 
     @Override
-    public void fixPosAfterShooting() {
-        //Do nothing
+    public void fixPosAfterShooting() throws InterruptedException {
+        spinRightDegrees(DEFAULT_SPIN_SPEED, 180);
     }
 
     @Override
     public void moveAcrossField(double power) {
-        goDiagonalBackwardLeft(power);
+        goDiagonalForwardLeft(power);
     }
 
     @Override
     public void moveAcrossFieldDistance(double power, double centimeters) throws InterruptedException {
-        goDiagonalBackwardLeftDistance(power, centimeters);
+        goDiagonalForwardLeftDistance(power, centimeters);
     }
 
     @Override
     public void moveAlongBeaconWall(double power) {
-        goBackward(power);
+        goForward(power);
     }
 
     @Override
     public void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException {
-        goBackwardDistance(power, centimeters);
+        goForwardDistance(power, centimeters);
     }
 
     @Override
     public void findTapeInward() throws InterruptedException {
-        findTapeLeft();
+        findTapeRight();
     }
 
     @Override
     public void findTapeOutward() throws InterruptedException {
-        findTapeRight();
+        findTapeLeft();
     }
 
     @Override
@@ -59,14 +57,17 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
         int[] colors = getAverageColor(leftColorSensor, rightColorSensor);
         int leftColor = colors[0];
         int rightColor = colors[1];
-        double leftBlue = Color.blue(leftColor);
-        double rightBlue = Color.blue(rightColor);
         double leftRed = Color.red(leftColor);
         double rightRed = Color.red(rightColor);
-        if (leftBlue > rightBlue && leftRed < rightRed) {
+        double leftBlue = Color.blue(leftColor);
+        double rightBlue = Color.blue(rightColor);
+        if (leftRed > rightRed && leftBlue < rightBlue) {
             leftFlapServo.setPosition(leftFlapEndPos);
             rightFlapServo.setPosition(rightFlapInitPos);
-        } else if (rightBlue > leftBlue && rightRed < leftRed) {
+        } else if (rightRed > leftRed && rightBlue < leftBlue) {
+            rightFlapServo.setPosition(rightFlapEndPos);
+            leftFlapServo.setPosition(leftFlapInitPos);
+        } else { //testing without working beacon only
             rightFlapServo.setPosition(rightFlapEndPos);
             leftFlapServo.setPosition(leftFlapInitPos);
         }
@@ -74,6 +75,6 @@ public class BlueAutonomousOpMode extends CompetitionAutonomousOpMode {
 
     @Override
     public void setTeleOpAngle() {
-        CompetitionTeleOp.currentAngle = 270;
+        CompetitionTeleOp.currentAngle = 90;
     }
 }

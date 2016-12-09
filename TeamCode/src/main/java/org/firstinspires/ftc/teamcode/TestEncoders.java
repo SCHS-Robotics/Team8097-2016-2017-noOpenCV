@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "Test Encoders", group = "Test")
-public class TestEncoders extends AutonomousOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Test Encoders", group = "Test")
+public class TestEncoders extends Autonomous {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
