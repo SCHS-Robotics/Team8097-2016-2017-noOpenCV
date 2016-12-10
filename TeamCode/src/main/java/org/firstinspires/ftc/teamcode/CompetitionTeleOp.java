@@ -26,6 +26,7 @@ public class CompetitionTeleOp extends BaseOpMode {
     public final static double MIN_SPEED = 0;
 
     boolean prevA = false;
+    boolean prevX = false;
 
     double pos = launcherServoInitPos;
 
@@ -94,23 +95,37 @@ public class CompetitionTeleOp extends BaseOpMode {
                 leftFlapServo.setPosition(leftFlapInitPos);
             }
 
-            if (gamepad1.a && !prevA) {
+            //Collection
+            if ((gamepad2.x || gamepad1.x) && !prevX) {
+                if (collectionMotor.getPower() == 0) {
+                    collectionMotor.setPower(1);
+                } else {
+                    collectionMotor.setPower(0);
+                }
+                prevX = true;
+            } else if (!(gamepad2.x || gamepad1.x) && prevX) {
+                prevX = false;
+            }
+
+            //Launcher
+            if ((gamepad2.a || gamepad1.a) && !prevA) {
                 if (leftLaunchMotor.getPower() == 0) {
                     startLauncher();
                 } else {
                     stopLauncher();
                 }
                 prevA = true;
-            } else if (!gamepad1.a && prevA) {
+            } else if (!(gamepad2.a || gamepad1.a) && prevA) {
                 prevA = false;
             }
 
-            if (gamepad1.b && leftLaunchMotor.getPower() != 0) {
+            //Launch
+            if ((gamepad2.b || gamepad1.b) && leftLaunchMotor.getPower() != 0) {
                 liftTime.reset();
                 leftLiftServo.setPosition(leftLiftEndPos);
                 rightLiftServo.setPosition(rightLiftEndPos);
             }
-            if (liftTime.time() >= 500) {
+            if (liftTime.time() >= 300) {
                 leftLiftServo.setPosition(leftLiftInitPos);
                 rightLiftServo.setPosition(rightLiftInitPos);
             }

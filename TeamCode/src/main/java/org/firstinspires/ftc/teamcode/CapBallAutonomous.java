@@ -19,7 +19,11 @@ public class CapBallAutonomous extends CompetitionAutonomous {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        //TODO basically wait 10 seconds, goForward to hit cap ball, pause for a second, go a little bit forward to partially park
+        sleep(15000);
+        goForwardDistance(DEFAULT_FORWARD_SPEED, 165);
+        sleep(2000);
+        goForwardDistance(DEFAULT_FORWARD_SPEED, 12);
+
 
         while (opModeIsActive()) {
             idle();

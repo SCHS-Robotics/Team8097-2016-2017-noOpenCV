@@ -8,7 +8,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     double backTapeLowThreshold;
 
     final int closeToWallDistance = 30;//centimeters
-    final int beforePushingButtonDistance = 18;//centimeters
+    final int beforePushingButtonDistance = 16;//centimeters
     final int pushingButtonDistance = 12;//centimeters
 
     @Override
@@ -33,13 +33,13 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
         findTapeInward();
-//        alignWithWall();
+        alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
-        sleep(100000);
+//        sleep(100000);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
-//        alignWithWall();
+        alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
         setTeleOpAngle();
@@ -71,12 +71,13 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 
 
     public void alignWithWall() throws InterruptedException {
-        double angleOffset = determineAngleOffset();
-        if (angleOffset > 2) {
-            spinRightDegrees(0.25, angleOffset);
-        } else if (angleOffset < -2) {
-            spinLeftDegrees(0.25, -angleOffset);
-        }
+//        double angleOffset = determineAngleOffset();
+//        if (angleOffset > 2) {
+//            spinRightDegrees(0.25, angleOffset);
+//        } else if (angleOffset < -2) {
+//            spinLeftDegrees(0.25, -angleOffset);
+//        }
+        goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
         goToBeaconWall(0.25, beforePushingButtonDistance);
         stopRobot();
     }
@@ -143,6 +144,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 
     public void pushButton() throws InterruptedException {
         goToBeaconWall(0.5, pushingButtonDistance);
+        moveAlongStartWallDistance(0.5, 0.3);
         goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
         resetButtonFlaps();
     }

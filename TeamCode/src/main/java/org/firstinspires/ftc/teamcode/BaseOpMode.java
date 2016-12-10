@@ -66,11 +66,11 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapNoButtonPos = 0.316;
     double rightFlapNoButtonPos = 0.690;
     double rangeServoInitPos = 0.518;
-    double launcherServoInitPos = 0.486;
+    double launcherServoInitPos = 0.550;
     double leftLiftInitPos = 0.636;
     double rightLiftInitPos = 0.210;
-    double leftLiftEndPos = 0.244; //0.324
-    double rightLiftEndPos = 0.608; //0.494
+    double leftLiftEndPos = 0.354; //0.324
+    double rightLiftEndPos = 0.664; //0.494
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 
@@ -97,8 +97,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public void startLauncher() {
-        leftLaunchMotor.setPower(-1);
-        rightLaunchMotor.setPower(1);
+        leftLaunchMotor.setPower(-0.9);
+        rightLaunchMotor.setPower(9);
     }
 
     public void stopLauncher() {
@@ -232,7 +232,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public void initCollection() {
-        collectionMotor = hardwareMap.dcMotor.get("collection");
+        collectionMotor = hardwareMap.dcMotor.get("collect");
     }
 
     public void initRange() {
@@ -273,7 +273,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     public void allInit() {
         initWheels();
         initLauncher();
-//        initCollection();
+        initCollection();
         initRange();
         initTape();
         initButtons();
