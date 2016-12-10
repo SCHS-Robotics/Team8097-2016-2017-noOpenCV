@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "TeleOp", group = "OpMode")
@@ -29,6 +28,9 @@ public class CompetitionTeleOp extends BaseOpMode {
     boolean prevX = false;
 
     double pos = launcherServoInitPos;
+    ElapsedTime launchTestingTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    int launchTestingWaitTime = 250;
+    double launchTestingRpm;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -42,6 +44,9 @@ public class CompetitionTeleOp extends BaseOpMode {
         runtime.reset();
         pushButtonTime.reset();
         liftTime.reset();
+
+        resetEncoders(leftLaunchMotor, rightLaunchMotor);
+        launchTestingTimer.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -131,16 +136,23 @@ public class CompetitionTeleOp extends BaseOpMode {
             }
 
             //Launcher Testing
-            if (gamepad1.dpad_down) {
-                if (pos + 0.002 <= 1)
-                    pos += 0.002;
-            } else if (gamepad1.dpad_up) {
-                if (pos - 0.002 >= 0)
-                    pos -= 0.002;
+//            if (gamepad1.dpad_down) {
+//                if (pos + 0.002 <= 1)
+//                    pos += 0.002;
+//            } else if (gamepad1.dpad_up) {
+//                if (pos - 0.002 >= 0)
+//                    pos -= 0.002;
+//            }
+//            launcherServo.setPosition(pos);
+//            logData("position", pos);
+            if (launchTestingTimer.time() >= launchTestingWaitTime) {
+                launchTestingRpm = (getCurrentRpm(launcherEncoderPpr, leftLaunchMotor, launchTestingWaitTime) + getCurrentRpm(launcherEncoderPpr, rightLaunchMotor, launchTestingWaitTime)) / 2;
+                launchTestingTimer.reset();
+                encoderStartPos.put(leftLaunchMotor, leftLaunchMotor.getCurrentPosition());
+                encoderStartPos.put(rightLaunchMotor, rightLaunchMotor.getCurrentPosition());
             }
-            logData("position", pos);
+            logData("launcher rpm", launchTestingRpm);
             updateTelemetry();
-            launcherServo.setPosition(pos);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }

@@ -36,7 +36,6 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         alignWithWall();
         moveCorrectButtonFlap();
         pushButton();
-//        sleep(100000);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
         alignWithWall();
@@ -144,7 +143,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 
     public void pushButton() throws InterruptedException {
         goToBeaconWall(0.5, pushingButtonDistance);
-        moveAlongStartWallDistance(0.5, 0.3);
+        moveAlongStartWallDistance(0.5, 0.4);
         goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
         resetButtonFlaps();
     }
