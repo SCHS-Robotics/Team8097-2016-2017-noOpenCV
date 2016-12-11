@@ -128,6 +128,7 @@ public class CompetitionTeleOp extends BaseOpMode {
             if ((gamepad2.b || gamepad1.b) && leftLaunchMotor.getPower() != 0) {
                 liftTime.reset();
                 leftLiftServo.setPosition(leftLiftEndPos);
+                sleep(50);
                 rightLiftServo.setPosition(rightLiftEndPos);
             }
             if (liftTime.time() >= 300) {
@@ -135,21 +136,21 @@ public class CompetitionTeleOp extends BaseOpMode {
                 rightLiftServo.setPosition(rightLiftInitPos);
             }
 
-            //Launcher Testing
-//            if (gamepad1.dpad_down) {
-//                if (pos + 0.002 <= 1)
-//                    pos += 0.002;
-//            } else if (gamepad1.dpad_up) {
-//                if (pos - 0.002 >= 0)
-//                    pos -= 0.002;
-//            }
-//            launcherServo.setPosition(pos);
-//            logData("position", pos);
+//            Launcher Testing
+            if (gamepad1.dpad_down || gamepad2.dpad_down) {
+                if (pos + 0.002 <= 1)
+                    pos += 0.002;
+            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
+                if (pos - 0.002 >= 0)
+                    pos -= 0.002;
+            }
+            launcherServo.setPosition(pos);
+            logData("position", pos);
             if (launchTestingTimer.time() >= launchTestingWaitTime) {
                 launchTestingRpm = (getCurrentRpm(launcherEncoderPpr, leftLaunchMotor, launchTestingWaitTime) + getCurrentRpm(launcherEncoderPpr, rightLaunchMotor, launchTestingWaitTime)) / 2;
                 launchTestingTimer.reset();
-                encoderStartPos.put(leftLaunchMotor, leftLaunchMotor.getCurrentPosition());
-                encoderStartPos.put(rightLaunchMotor, rightLaunchMotor.getCurrentPosition());
+                encoderStartPos.put(leftLaunchMotor, Math.abs(leftLaunchMotor.getCurrentPosition()));
+                encoderStartPos.put(rightLaunchMotor, Math.abs(rightLaunchMotor.getCurrentPosition()));
             }
             logData("launcher rpm", launchTestingRpm);
             updateTelemetry();

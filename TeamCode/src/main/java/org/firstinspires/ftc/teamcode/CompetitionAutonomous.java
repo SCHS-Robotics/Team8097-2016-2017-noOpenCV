@@ -5,9 +5,10 @@ public abstract class CompetitionAutonomous extends Autonomous {
     public void shoot() throws InterruptedException {
         int numTries = numParticles() + 1;
         startLauncher();
-        sleep(500);
+        sleep(1000);
         for (int i = 0; i < numTries + 1; i++) {
             leftLiftServo.setPosition(leftLiftEndPos);
+            sleep(50);
             rightLiftServo.setPosition(rightLiftEndPos);
             sleep(300);
             leftLiftServo.setPosition(leftLiftInitPos);

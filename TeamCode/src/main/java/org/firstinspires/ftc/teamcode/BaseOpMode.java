@@ -61,16 +61,14 @@ public abstract class BaseOpMode extends LinearOpMode {
 
     double leftFlapInitPos = 0.672;
     double rightFlapInitPos = 0.328;
-    double leftFlapEndPos = 0.388;
-    double rightFlapEndPos = 0.620;
-    double leftFlapNoButtonPos = 0.316;
-    double rightFlapNoButtonPos = 0.690;
+    double leftFlapEndPos = 0.334;
+    double rightFlapEndPos = 0.640;
     double rangeServoInitPos = 0.518;
-    double launcherServoInitPos = 0.550;
+    double launcherServoInitPos = 0.214;
     double leftLiftInitPos = 0.636;
     double rightLiftInitPos = 0.210;
-    double leftLiftEndPos = 0.354; //0.324
-    double rightLiftEndPos = 0.664; //0.494
+    double leftLiftEndPos = 0.354;
+    double rightLiftEndPos = 0.664;
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 

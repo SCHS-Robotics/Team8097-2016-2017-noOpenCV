@@ -76,8 +76,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 //        } else if (angleOffset < -2) {
 //            spinLeftDegrees(0.25, -angleOffset);
 //        }
-        goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
-        goToBeaconWall(0.25, beforePushingButtonDistance);
+        goAwayFromBeaconWall(0.5, beforePushingButtonDistance);
+        goToBeaconWall(0.5, beforePushingButtonDistance);
         stopRobot();
     }
 
@@ -143,8 +143,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 
     public void pushButton() throws InterruptedException {
         goToBeaconWall(0.5, pushingButtonDistance);
-        moveAlongStartWallDistance(0.5, 0.4);
-        goAwayFromBeaconWall(0.25, beforePushingButtonDistance);
+        moveAlongStartWallDistance(0.5, 0.5);
+        goAwayFromBeaconWall(0.5, beforePushingButtonDistance);
         resetButtonFlaps();
     }
 
