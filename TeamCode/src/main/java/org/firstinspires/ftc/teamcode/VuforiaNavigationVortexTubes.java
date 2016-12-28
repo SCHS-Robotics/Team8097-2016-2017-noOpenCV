@@ -86,7 +86,7 @@ import java.util.List;
  */
 
 @Autonomous(name = "Vuforia Navigation", group = "Testing")
-public class VuforiaNavigation extends LinearOpMode {
+public class VuforiaNavigationVortexTubes extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";
 
@@ -137,20 +137,20 @@ public class VuforiaNavigation extends LinearOpMode {
          * example "StonesAndChips", datasets can be found in in this project in the
          * documentation directory.
          */
-        VuforiaTrackables ftcPics = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        VuforiaTrackables vortexTubes = this.vuforia.loadTrackablesFromAsset("VortexTubes");
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
-        VuforiaTrackable wheels = ftcPics.get(0);
-        wheels.setName("wheels");
-        VuforiaTrackable tools = ftcPics.get(1);
-        tools.setName("tools");
-        VuforiaTrackable legos = ftcPics.get(2);
-        legos.setName("legos");
-        VuforiaTrackable gears = ftcPics.get(3);
-        gears.setName("gears");
+        VuforiaTrackable redShort = vortexTubes.get(0);
+        redShort.setName("redShort");
+        VuforiaTrackable redLong = vortexTubes.get(1);
+        redLong.setName("redLong");
+        VuforiaTrackable blueShort = vortexTubes.get(2);
+        blueShort.setName("blueShort");
+        VuforiaTrackable blueLong = vortexTubes.get(3);
+        blueLong.setName("blueLong");
 
         /** For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(ftcPics);
+        allTrackables.addAll(vortexTubes);
 
         /**
          * We use units of mm here because that's the recommended units of measurement for the
@@ -227,7 +227,7 @@ public class VuforiaNavigation extends LinearOpMode {
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 90, 0));
-        wheels.setLocation(wheelsTargetLocationOnField);
+        redShort.setLocation(wheelsTargetLocationOnField);
         RobotLog.ii(TAG, "Wheels Target=%s", format(wheelsTargetLocationOnField));
 
        /*
@@ -243,7 +243,7 @@ public class VuforiaNavigation extends LinearOpMode {
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 0, 0));
-        tools.setLocation(toolsTargetLocationOnField);
+        redLong.setLocation(toolsTargetLocationOnField);
         RobotLog.ii(TAG, "Wheels Target=%s", format(toolsTargetLocationOnField));
 
         OpenGLMatrix legosTargetLocationOnField = OpenGLMatrix
@@ -254,7 +254,7 @@ public class VuforiaNavigation extends LinearOpMode {
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 0, 0));
-        legos.setLocation(legosTargetLocationOnField);
+        blueShort.setLocation(legosTargetLocationOnField);
         RobotLog.ii(TAG, "Legos Target=%s", format(legosTargetLocationOnField));
 
         OpenGLMatrix gearsTargetLocationOnField = OpenGLMatrix
@@ -265,7 +265,7 @@ public class VuforiaNavigation extends LinearOpMode {
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 0, 0));
-        gears.setLocation(gearsTargetLocationOnField);
+        blueLong.setLocation(gearsTargetLocationOnField);
         RobotLog.ii(TAG, "Gears Target=%s", format(gearsTargetLocationOnField));
 
         /**
@@ -292,10 +292,10 @@ public class VuforiaNavigation extends LinearOpMode {
          * listener is a {@link VuforiaTrackableDefaultListener} and can so safely cast because
          * we have not ourselves installed a listener of a different type.
          */
-        ((VuforiaTrackableDefaultListener) wheels.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
-        ((VuforiaTrackableDefaultListener) tools.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
-        ((VuforiaTrackableDefaultListener) legos.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
-        ((VuforiaTrackableDefaultListener) gears.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) redShort.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) redLong.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) blueShort.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) blueLong.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
 
 
         /**
@@ -323,7 +323,7 @@ public class VuforiaNavigation extends LinearOpMode {
         waitForStart();
 
         /** Start tracking the data sets we care about. */
-        ftcPics.activate();
+        vortexTubes.activate();
 
         while (opModeIsActive()) {
 
