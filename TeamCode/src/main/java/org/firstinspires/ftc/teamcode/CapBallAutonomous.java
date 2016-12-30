@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class CapBallAutonomous extends CompetitionAutonomous {
     @Override
     public int numParticles() {
-        return 0;
+        return 2;
     }
 
     @Override
@@ -19,8 +19,10 @@ public class CapBallAutonomous extends CompetitionAutonomous {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        sleep(15000);
-        goForwardDistance(DEFAULT_FORWARD_SPEED, 165);
+        goForwardDistance(DEFAULT_FORWARD_SPEED, 25);
+        shoot();
+        sleep(10000);
+        goForwardDistance(DEFAULT_FORWARD_SPEED, 150);
         sleep(2000);
         goForwardDistance(DEFAULT_FORWARD_SPEED, 12);
 

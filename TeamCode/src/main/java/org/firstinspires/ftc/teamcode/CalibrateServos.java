@@ -67,6 +67,8 @@ public class CalibrateServos extends BaseOpMode {
             logData("rightFlap", pos2);
 //            launcherServo.setPosition(pos3);
 //            logData("launcher", pos3);
+
+            logData("range", rangeSensor.rawUltrasonic());
             sleep(10);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

@@ -7,9 +7,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
 
-    final int closeToWallDistance = 30;//centimeters
-    final int beforePushingButtonDistance = 16;//centimeters
-    final int pushingButtonDistance = 12;//centimeters
+    final int closeToWallDistance = 20;//centimeters
+    final int beforePushingButtonDistance = 8;//centimeters
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -34,12 +33,11 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
         findTapeInward();
         alignWithWall();
-        moveCorrectButtonFlap();
         pushButton();
+        moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 10);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
         alignWithWall();
-        moveCorrectButtonFlap();
         pushButton();
         setTeleOpAngle();
 
@@ -142,9 +140,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     public abstract void moveCorrectButtonFlap() throws InterruptedException;
 
     public void pushButton() throws InterruptedException {
-        goToBeaconWall(0.5, pushingButtonDistance);
-        moveAlongStartWallDistance(0.5, 0.5);
-        goAwayFromBeaconWall(0.5, beforePushingButtonDistance);
+        moveCorrectButtonFlap();
+        sleep(500);
         resetButtonFlaps();
     }
 

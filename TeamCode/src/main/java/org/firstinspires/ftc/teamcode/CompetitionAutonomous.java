@@ -8,7 +8,7 @@ public abstract class CompetitionAutonomous extends Autonomous {
         sleep(1000);
         for (int i = 0; i < numTries + 1; i++) {
             leftLiftServo.setPosition(leftLiftEndPos);
-            sleep(50);
+            sleep(23);
             rightLiftServo.setPosition(rightLiftEndPos);
             sleep(300);
             leftLiftServo.setPosition(leftLiftInitPos);

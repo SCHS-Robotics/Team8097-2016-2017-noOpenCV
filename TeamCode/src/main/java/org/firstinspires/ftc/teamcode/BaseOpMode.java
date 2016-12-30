@@ -59,12 +59,12 @@ public abstract class BaseOpMode extends LinearOpMode {
     I2cAddr rangeI2c = I2cAddr.create8bit(0x28);
 //    I2cAddr rightRangeI2c = I2cAddr.create8bit(0x38);
 
-    double leftFlapInitPos = 0.672;
-    double rightFlapInitPos = 0.328;
-    double leftFlapEndPos = 0.334;
-    double rightFlapEndPos = 0.640;
+    double leftFlapInitPos = 0.710;
+    double rightFlapInitPos = 0.324;
+    double leftFlapEndPos = 0.512;
+    double rightFlapEndPos = 0.502;
     double rangeServoInitPos = 0.518;
-    double launcherServoInitPos = 0.214;
+    double launcherServoInitPos = 0.816;
     double leftLiftInitPos = 0.636;
     double rightLiftInitPos = 0.210;
     double leftLiftEndPos = 0.354;

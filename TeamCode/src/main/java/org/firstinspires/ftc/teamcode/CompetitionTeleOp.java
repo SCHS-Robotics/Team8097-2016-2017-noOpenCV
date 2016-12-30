@@ -128,7 +128,7 @@ public class CompetitionTeleOp extends BaseOpMode {
             if ((gamepad2.b || gamepad1.b) && leftLaunchMotor.getPower() != 0) {
                 liftTime.reset();
                 leftLiftServo.setPosition(leftLiftEndPos);
-                sleep(50);
+                sleep(23);
                 rightLiftServo.setPosition(rightLiftEndPos);
             }
             if (liftTime.time() >= 300) {

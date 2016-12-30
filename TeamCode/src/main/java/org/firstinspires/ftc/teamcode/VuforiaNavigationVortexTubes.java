@@ -85,7 +85,7 @@ import java.util.List;
  * is explained below.
  */
 
-@Autonomous(name = "Vuforia Navigation", group = "Testing")
+@Autonomous(name = "Vortex Tube Vuforia Navigation", group = "Testing")
 public class VuforiaNavigationVortexTubes extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";
@@ -138,7 +138,7 @@ public class VuforiaNavigationVortexTubes extends LinearOpMode {
          * documentation directory.
          */
         VuforiaTrackables vortexTubes = this.vuforia.loadTrackablesFromAsset("VortexTubes");
-        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_OBJECT_TARGETS, 4);
         VuforiaTrackable redShort = vortexTubes.get(0);
         redShort.setName("redShort");
         VuforiaTrackable redLong = vortexTubes.get(1);
