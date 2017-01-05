@@ -64,11 +64,17 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapEndPos = 0.512;
     double rightFlapEndPos = 0.502;
     double rangeServoInitPos = 0.518;
-    double launcherServoInitPos = 0.816;
+    double launcherServoAutoPos = 0.816;
+    double launcherServoShortPos;//TODO
+    double launcherServoFarPos = launcherServoAutoPos;//TODO
+    double launcherServoInitPos = launcherServoAutoPos;
     double leftLiftInitPos = 0.636;
     double rightLiftInitPos = 0.210;
     double leftLiftEndPos = 0.354;
     double rightLiftEndPos = 0.664;
+
+    int launchFarServoWaitTime = 38;//milliseconds
+    int launchShortServoWaitTime = 38;//TODO milliseconds
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 
@@ -95,13 +101,23 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public void startLauncher() {
-        leftLaunchMotor.setPower(-0.9);
-        rightLaunchMotor.setPower(9);
+        leftLaunchMotor.setPower(-1);
+        rightLaunchMotor.setPower(1);
     }
 
     public void stopLauncher() {
         leftLaunchMotor.setPower(0);
         rightLaunchMotor.setPower(0);
+    }
+
+    public void liftToLaunch() throws InterruptedException {
+        leftLiftServo.setPosition(leftLiftEndPos);
+        if (launcherServo.getPosition() == launcherServoShortPos) {
+            sleep(launchShortServoWaitTime);
+        } else {
+            sleep(launchFarServoWaitTime);
+        }
+        rightLiftServo.setPosition(rightLiftEndPos);
     }
 
     public void stopRobot() {

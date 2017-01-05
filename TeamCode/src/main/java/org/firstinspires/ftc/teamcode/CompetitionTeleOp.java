@@ -127,14 +127,20 @@ public class CompetitionTeleOp extends BaseOpMode {
             //Launch
             if ((gamepad2.b || gamepad1.b) && leftLaunchMotor.getPower() != 0) {
                 liftTime.reset();
-                leftLiftServo.setPosition(leftLiftEndPos);
-                sleep(23);
-                rightLiftServo.setPosition(rightLiftEndPos);
+                liftToLaunch();
             }
             if (liftTime.time() >= 300) {
                 leftLiftServo.setPosition(leftLiftInitPos);
                 rightLiftServo.setPosition(rightLiftInitPos);
             }
+
+//            Regular Launcher Stuff
+            if (gamepad1.dpad_down || gamepad2.dpad_down) {
+                launcherServo.setPosition(launcherServoShortPos);
+            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
+                launcherServo.setPosition(launcherServoFarPos);
+            }
+
 
 //            Launcher Testing
             if (gamepad1.dpad_down || gamepad2.dpad_down) {
@@ -146,6 +152,8 @@ public class CompetitionTeleOp extends BaseOpMode {
             }
             launcherServo.setPosition(pos);
             logData("position", pos);
+
+//            RPM log
             if (launchTestingTimer.time() >= launchTestingWaitTime) {
                 launchTestingRpm = (getCurrentRpm(launcherEncoderPpr, leftLaunchMotor, launchTestingWaitTime) + getCurrentRpm(launcherEncoderPpr, rightLaunchMotor, launchTestingWaitTime)) / 2;
                 launchTestingTimer.reset();
@@ -153,8 +161,8 @@ public class CompetitionTeleOp extends BaseOpMode {
                 encoderStartPos.put(rightLaunchMotor, Math.abs(rightLaunchMotor.getCurrentPosition()));
             }
             logData("launcher rpm", launchTestingRpm);
-            updateTelemetry();
 
+            updateTelemetry();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
