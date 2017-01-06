@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
 public abstract class BeaconsAutonomous extends CompetitionAutonomous {
@@ -8,7 +10,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     double backTapeLowThreshold;
 
     final int closeToWallDistance = 20;//centimeters
-    final int beforePushingButtonDistance = 8;//centimeters
+    final int beforePushingButtonDistance = 10;//centimeters
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -34,7 +36,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         findTapeInward();
         alignWithWall();
         pushButton();
-        moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 10);
+        goAwayFromBeaconWall(DEFAULT_SIDEWAYS_SPEED, 17);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
         alignWithWall();
@@ -140,9 +142,26 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     public abstract void moveCorrectButtonFlap() throws InterruptedException;
 
     public void pushButton() throws InterruptedException {
-        moveCorrectButtonFlap();
-        sleep(500);
-        resetButtonFlaps();
+        do {
+            moveCorrectButtonFlap();
+            sleep(250);
+            resetButtonFlaps();
+            sleep(250);
+        } while (!buttonIsPressed());
+    }
+
+    public boolean buttonIsPressed() throws InterruptedException {
+        int[] colors = getAverageColor(leftColorSensor, rightColorSensor);
+        int leftColor = colors[0];
+        int rightColor = colors[1];
+        double leftBlue = Color.blue(leftColor);
+        double rightBlue = Color.blue(rightColor);
+        double leftRed = Color.red(leftColor);
+        double rightRed = Color.red(rightColor);
+        if (Math.abs(leftBlue - rightBlue) < 5 && Math.abs(leftRed - rightRed) < 5) {
+            return true;
+        }
+        return false;
     }
 
     public void resetButtonFlaps() {

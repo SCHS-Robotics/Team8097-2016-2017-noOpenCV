@@ -73,8 +73,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftLiftEndPos = 0.354;
     double rightLiftEndPos = 0.664;
 
-    int launchFarServoWaitTime = 38;//milliseconds
-    int launchShortServoWaitTime = 38;//TODO milliseconds
+    int launchFarServoWaitTime = 33;//milliseconds
+    int launchShortServoWaitTime = 33;//TODO milliseconds
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 

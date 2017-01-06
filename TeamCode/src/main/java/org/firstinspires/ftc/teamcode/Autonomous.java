@@ -154,7 +154,7 @@ public abstract class Autonomous extends BaseOpMode {
         double[] averageRed = new double[n];
         double[] averageGreen = new double[n];
         double[] averageBlue = new double[n];
-        int numReads = 10;
+        int numReads = 5;
         for (int i = 0; i < numReads; i++) {
             for (int j = 0; j < n; j++) {
                 int color = colorSensors[j].argb();

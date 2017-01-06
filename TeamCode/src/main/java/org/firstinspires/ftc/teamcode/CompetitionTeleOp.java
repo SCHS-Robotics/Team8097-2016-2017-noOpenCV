@@ -89,11 +89,11 @@ public class CompetitionTeleOp extends BaseOpMode {
             if (gamepad1.left_bumper) {
                 pushButtonTime.reset();
                 leftFlapServo.setPosition(leftFlapEndPos);
-                rightFlapServo.setPosition(rightFlapInitPos);
+                rightFlapServo.setPosition(rightFlapEndPos);
             } else if (gamepad1.right_bumper) {
                 pushButtonTime.reset();
                 rightFlapServo.setPosition(rightFlapEndPos);
-                leftFlapServo.setPosition(leftFlapInitPos);
+                leftFlapServo.setPosition(leftFlapEndPos);
             }
             if (pushButtonTime.time() >= 500) {
                 rightFlapServo.setPosition(rightFlapInitPos);
@@ -141,12 +141,11 @@ public class CompetitionTeleOp extends BaseOpMode {
                 launcherServo.setPosition(launcherServoFarPos);
             }
 
-
 //            Launcher Testing
-            if (gamepad1.dpad_down || gamepad2.dpad_down) {
+            if (gamepad1.dpad_left || gamepad2.dpad_left) {
                 if (pos + 0.002 <= 1)
                     pos += 0.002;
-            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
+            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
                 if (pos - 0.002 >= 0)
                     pos -= 0.002;
             }
