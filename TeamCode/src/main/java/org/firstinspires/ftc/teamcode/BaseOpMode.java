@@ -49,11 +49,11 @@ public abstract class BaseOpMode extends LinearOpMode {
     ColorSensor rightColorSensor;
     ColorSensor leftColorSensor;
     ColorSensor frontTapeSensor;
-    //    ColorSensor backTapeSensor;
+    ColorSensor backTapeSensor;
     I2cAddr leftColorI2c = I2cAddr.create8bit(0x3c);
     I2cAddr rightColorI2c = I2cAddr.create8bit(0x4c);
     I2cAddr frontTapeI2c = I2cAddr.create8bit(0x5c);
-    //    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
+    I2cAddr backTapeI2c = I2cAddr.create8bit(0x6c);
     RangeSensor rangeSensor;
     //    RangeSensor rightRangeSensor;
     I2cAddr rangeI2c = I2cAddr.create8bit(0x28);
@@ -64,17 +64,17 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapEndPos = 0.512;
     double rightFlapEndPos = 0.502;
     double rangeServoInitPos = 0.518;
-    double launcherServoAutoPos = 0.816;
-    double launcherServoShortPos;//TODO
-    double launcherServoFarPos = launcherServoAutoPos;//TODO
+    double launcherServoAutoPos = 0.662;
+    double launcherServoShortPos = 0.332;
+    double launcherServoFarPos = launcherServoAutoPos;
     double launcherServoInitPos = launcherServoAutoPos;
     double leftLiftInitPos = 0.636;
     double rightLiftInitPos = 0.210;
     double leftLiftEndPos = 0.354;
     double rightLiftEndPos = 0.664;
 
-    int launchFarServoWaitTime = 33;//milliseconds
-    int launchShortServoWaitTime = 33;//TODO milliseconds
+    int launchFarServoWaitTime = 25;//milliseconds
+    int launchShortServoWaitTime = 13;//milliseconds
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
 
@@ -263,10 +263,11 @@ public abstract class BaseOpMode extends LinearOpMode {
 
     public void initTape() {
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
-//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+        backTapeSensor = hardwareMap.colorSensor.get("backTape");
         frontTapeSensor.setI2cAddress(frontTapeI2c);
+        backTapeSensor.setI2cAddress(backTapeI2c);
         frontTapeSensor.enableLed(true);
-//        backTapeSensor.enableLed(true);
+        backTapeSensor.enableLed(true);
     }
 
     public void initButtons() {

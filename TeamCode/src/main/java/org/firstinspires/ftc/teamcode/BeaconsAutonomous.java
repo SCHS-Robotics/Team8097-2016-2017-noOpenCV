@@ -9,7 +9,7 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     double frontTapeLowThreshold;
     double backTapeLowThreshold;
 
-    final int closeToWallDistance = 20;//centimeters
+    final int closeToWallDistance = 25;//centimeters
     final int beforePushingButtonDistance = 10;//centimeters
 
     @Override
@@ -35,11 +35,15 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
         findTapeInward();
         alignWithWall();
+        goForwardDistance(0.5, 1);
+        findTapeLeft();
         pushButton();
-        goAwayFromBeaconWall(DEFAULT_SIDEWAYS_SPEED, 17);
+        moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 15);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
         alignWithWall();
+        goForwardDistance(0.5, 1);
+        findTapeLeft();
         pushButton();
         setTeleOpAngle();
 
@@ -98,39 +102,62 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
 
     public abstract void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException;
 
-    //These movements are with respect to the autonomous side of the robot.
-    public void moveLeftSideForward(double power) {
-        moveBackWheelsLeft(power);
-    }
-
-    public void moveLeftSideBackward(double power) {
-        moveBackWheelsRight(power);
-    }
-
-    public void moveRightSideForward(double power) {
-        moveFrontWheelsLeft(power);
-    }
-
-    public void moveRightSideBackward(double power) {
-        moveFrontWheelsRight(power);
-    }
-
     public void findTapeRight() throws InterruptedException {
         sleep(250);
-        while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
-            logData("light", frontTapeSensor.alpha());
-            updateTelemetry();
-            goForward(0.25);
+        boolean firstTime = true;
+        while ((frontTapeSensor.alpha() < frontTapeLowThreshold || backTapeSensor.alpha() < backTapeLowThreshold) && opModeIsActive()) {
+            if (!firstTime) {
+                goBackwardDistance(0.25, 5);
+            }
+            firstTime = false;
+            while (frontTapeSensor.alpha() < frontTapeLowThreshold && backTapeSensor.alpha() < backTapeLowThreshold && opModeIsActive()) {
+                logData("light", frontTapeSensor.alpha());
+                updateTelemetry();
+                goForward(0.25);
+            }
+            if (frontTapeSensor.alpha() < frontTapeLowThreshold) {
+                while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
+                    logData("light", frontTapeSensor.alpha());
+                    updateTelemetry();
+                    moveLeftWheelsForward(0.25);
+                }
+            } else if (backTapeSensor.alpha() < backTapeLowThreshold) {
+                while (backTapeSensor.alpha() < backTapeLowThreshold && opModeIsActive()) {
+                    logData("light", frontTapeSensor.alpha());
+                    updateTelemetry();
+                    moveRightWheelsForward(0.25);
+                }
+            }
         }
         stopRobot();
     }
 
     public void findTapeLeft() throws InterruptedException {
         sleep(250);
-        while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
-            logData("light", frontTapeSensor.alpha());
-            updateTelemetry();
-            goBackward(0.25);
+        boolean firstTime = true;
+        while ((frontTapeSensor.alpha() < frontTapeLowThreshold || backTapeSensor.alpha() < backTapeLowThreshold) && opModeIsActive()) {
+            if (!firstTime) {
+                goForwardDistance(0.25, 5);
+            }
+            firstTime = false;
+            while (frontTapeSensor.alpha() < frontTapeLowThreshold && backTapeSensor.alpha() < backTapeLowThreshold && opModeIsActive()) {
+                logData("light", frontTapeSensor.alpha());
+                updateTelemetry();
+                goBackward(0.25);
+            }
+            if (frontTapeSensor.alpha() < frontTapeLowThreshold) {
+                while (frontTapeSensor.alpha() < frontTapeLowThreshold && opModeIsActive()) {
+                    logData("light", frontTapeSensor.alpha());
+                    updateTelemetry();
+                    moveLeftWheelsBackward(0.25);
+                }
+            } else if (backTapeSensor.alpha() < backTapeLowThreshold) {
+                while (backTapeSensor.alpha() < backTapeLowThreshold && opModeIsActive()) {
+                    logData("light", frontTapeSensor.alpha());
+                    updateTelemetry();
+                    moveRightWheelsBackward(0.25);
+                }
+            }
         }
         stopRobot();
     }
@@ -142,12 +169,12 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     public abstract void moveCorrectButtonFlap() throws InterruptedException;
 
     public void pushButton() throws InterruptedException {
-        do {
-            moveCorrectButtonFlap();
-            sleep(250);
-            resetButtonFlaps();
-            sleep(250);
-        } while (!buttonIsPressed());
+//        do {
+        moveCorrectButtonFlap();
+        sleep(250);
+        resetButtonFlaps();
+//            sleep(250);
+//        } while (!buttonIsPressed());
     }
 
     public boolean buttonIsPressed() throws InterruptedException {
@@ -172,13 +199,17 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     public abstract void setTeleOpAngle();
 
     public void loadTapeValues() {
-        frontTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -1000)) / 2.0;
+        double frontGround = FtcRobotControllerActivity.calibrationSP.getFloat("frontGroundValue", -1000);
+        double frontDiff = FtcRobotControllerActivity.calibrationSP.getFloat("frontTapeValue", -1000) - frontGround;
+        frontTapeLowThreshold = frontGround + frontDiff * 0.65;
         if (frontTapeLowThreshold < 0) {
-            frontTapeLowThreshold = 3;
+            frontTapeLowThreshold = 20;
         }
-        backTapeLowThreshold = (FtcRobotControllerActivity.calibrationSP.getFloat("backTapeValue", -1000) + FtcRobotControllerActivity.calibrationSP.getFloat("backGroundValue", -1000)) / 2.0;
+        double backGround = FtcRobotControllerActivity.calibrationSP.getFloat("backGroundValue", -1000);
+        double backDiff = FtcRobotControllerActivity.calibrationSP.getFloat("backTapeValue", -1000) - backGround;
+        backTapeLowThreshold = backGround + backDiff * 0.65;
         if (backTapeLowThreshold < 0) {
-            backTapeLowThreshold = 3;
+            backTapeLowThreshold = 20;
         }
     }
 }

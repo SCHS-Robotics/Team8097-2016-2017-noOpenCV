@@ -136,9 +136,9 @@ public class CompetitionTeleOp extends BaseOpMode {
 
 //            Regular Launcher Stuff
             if (gamepad1.dpad_down || gamepad2.dpad_down) {
-                launcherServo.setPosition(launcherServoShortPos);
+                pos = launcherServoShortPos;
             } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
-                launcherServo.setPosition(launcherServoFarPos);
+                pos = launcherServoFarPos;
             }
 
 //            Launcher Testing
@@ -149,6 +149,7 @@ public class CompetitionTeleOp extends BaseOpMode {
                 if (pos - 0.002 >= 0)
                     pos -= 0.002;
             }
+
             launcherServo.setPosition(pos);
             logData("position", pos);
 

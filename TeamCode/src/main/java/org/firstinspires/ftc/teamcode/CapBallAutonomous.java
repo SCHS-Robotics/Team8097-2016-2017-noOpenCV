@@ -19,10 +19,11 @@ public class CapBallAutonomous extends CompetitionAutonomous {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        goForwardDistance(DEFAULT_FORWARD_SPEED, 25);
+        goBackwardDistance(DEFAULT_FORWARD_SPEED, 60);
         shoot();
-        sleep(10000);
-        goForwardDistance(DEFAULT_FORWARD_SPEED, 150);
+        sleep(8000);
+        spinRightDegrees(DEFAULT_SPIN_SPEED, 180);
+        goForwardDistance(DEFAULT_FORWARD_SPEED, 115);
         sleep(2000);
         goForwardDistance(DEFAULT_FORWARD_SPEED, 12);
 

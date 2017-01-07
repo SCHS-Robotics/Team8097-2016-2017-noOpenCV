@@ -29,7 +29,9 @@ public class CalibrateTape extends BaseOpMode {
         frontTapeSensor = hardwareMap.colorSensor.get("frontTape");
         frontTapeSensor.setI2cAddress(frontTapeI2c);
         frontTapeSensor.enableLed(true);
-//        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+        backTapeSensor = hardwareMap.colorSensor.get("backTape");
+        backTapeSensor.setI2cAddress(backTapeI2c);
+        backTapeSensor.enableLed(true);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -41,14 +43,14 @@ public class CalibrateTape extends BaseOpMode {
             updateTelemetry();
 
             frontTapeSensor.enableLed(true);
-//            backTapeSensor.enableLed(true);
+            backTapeSensor.enableLed(true);
             logData("front light sensor", frontTapeSensor.alpha());
-//            logData("back light sensor", backTapeSensor.alpha());
+            logData("back light sensor", backTapeSensor.alpha());
             if (FtcRobotControllerActivity.calibrateTape) {
                 if (readings < 100) {
                     readings++;
                     frontValue += frontTapeSensor.alpha();
-//                    backValue += backTapeSensor.alpha();
+                    backValue += backTapeSensor.alpha();
                     setButtonsClickable(false);
                 } else {
                     readings = 0;
@@ -64,7 +66,7 @@ public class CalibrateTape extends BaseOpMode {
                 if (readings < 100) {
                     readings++;
                     frontValue += frontTapeSensor.alpha();
-//                    backValue += backTapeSensor.alpha();
+                    backValue += backTapeSensor.alpha();
                     setButtonsClickable(false);
                 } else {
                     readings = 0;
