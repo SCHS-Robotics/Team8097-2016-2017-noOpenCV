@@ -5,11 +5,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "TeleOp", group = "OpMode")
 public class CompetitionTeleOp extends BaseOpMode {
-    /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime pushButtonTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private ElapsedTime liftTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    final int waitTime = 100;
 
     public static double currentAngle = 90;//initialized in autonomous based on which one is run.
     boolean spun = false;
@@ -30,7 +28,8 @@ public class CompetitionTeleOp extends BaseOpMode {
     double pos = launcherServoInitPos;
     ElapsedTime launchTestingTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int launchTestingWaitTime = 250;
-    double launchTestingRpm;
+    double leftLaunchTestingRpm;
+    double rightLaunchTestingRpm;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -155,15 +154,16 @@ public class CompetitionTeleOp extends BaseOpMode {
 
 //            RPM log
             if (launchTestingTimer.time() >= launchTestingWaitTime) {
-                launchTestingRpm = (getCurrentRpm(launcherEncoderPpr, leftLaunchMotor, launchTestingWaitTime) + getCurrentRpm(launcherEncoderPpr, rightLaunchMotor, launchTestingWaitTime)) / 2;
+                leftLaunchTestingRpm = getCurrentRpm(launcherEncoderPpr, leftLaunchMotor, launchTestingWaitTime);
+                rightLaunchTestingRpm = getCurrentRpm(launcherEncoderPpr, rightLaunchMotor, launchTestingWaitTime);
                 launchTestingTimer.reset();
                 encoderStartPos.put(leftLaunchMotor, Math.abs(leftLaunchMotor.getCurrentPosition()));
                 encoderStartPos.put(rightLaunchMotor, Math.abs(rightLaunchMotor.getCurrentPosition()));
             }
-            logData("launcher rpm", launchTestingRpm);
+            logData("left launcher  rpm", leftLaunchTestingRpm);
+            logData("right launcher rpm", rightLaunchTestingRpm);
 
             updateTelemetry();
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
     }
 

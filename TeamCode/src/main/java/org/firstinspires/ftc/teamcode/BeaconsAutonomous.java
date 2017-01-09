@@ -23,6 +23,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        setTeleOpAngle();
+
         if (shouldShoot()) {
             shoot();
             goBackwardDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
@@ -46,7 +48,6 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         goForwardDistance(0.5, 5);
         findTapeLeft();
         pushButton();
-        setTeleOpAngle();
 
         while (opModeIsActive()) {
             idle();
