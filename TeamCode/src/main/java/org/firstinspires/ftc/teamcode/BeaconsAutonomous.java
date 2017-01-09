@@ -33,16 +33,17 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
         moveAlongStartWallDistance(DEFAULT_SIDEWAYS_SPEED, 102.0 / 2);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 102.0 / 2);
         goToBeaconWall(DEFAULT_SIDEWAYS_SPEED, closeToWallDistance);
+        fixPosForFindingTape();
         findTapeInward();
         alignWithWall();
-        goForwardDistance(0.5, 1);
+        goForwardDistance(0.5, 2);
         findTapeLeft();
         pushButton();
         moveAlongStartWallDistance(-DEFAULT_SIDEWAYS_SPEED, 15);
         moveAlongBeaconWallDistance(DEFAULT_FORWARD_SPEED, 105);
         findTapeInward();
         alignWithWall();
-        goForwardDistance(0.5, 1);
+        goForwardDistance(0.5, 5);
         findTapeLeft();
         pushButton();
         setTeleOpAngle();
@@ -101,6 +102,8 @@ public abstract class BeaconsAutonomous extends CompetitionAutonomous {
     public abstract void moveAlongBeaconWall(double power);
 
     public abstract void moveAlongBeaconWallDistance(double power, double centimeters) throws InterruptedException;
+
+    public abstract void fixPosForFindingTape() throws InterruptedException;
 
     public void findTapeRight() throws InterruptedException {
         sleep(250);

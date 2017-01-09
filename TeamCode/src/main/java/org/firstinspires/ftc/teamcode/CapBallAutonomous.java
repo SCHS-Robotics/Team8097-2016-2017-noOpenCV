@@ -21,7 +21,7 @@ public class CapBallAutonomous extends CompetitionAutonomous {
 
         goBackwardDistance(DEFAULT_FORWARD_SPEED, 60);
         shoot();
-        sleep(8000);
+        sleep(13000);
         spinRightDegrees(DEFAULT_SPIN_SPEED, 180);
         goForwardDistance(DEFAULT_FORWARD_SPEED, 115);
         sleep(2000);

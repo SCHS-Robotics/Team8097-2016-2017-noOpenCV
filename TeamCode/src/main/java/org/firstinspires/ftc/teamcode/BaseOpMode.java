@@ -64,7 +64,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftFlapEndPos = 0.512;
     double rightFlapEndPos = 0.502;
     double rangeServoInitPos = 0.518;
-    double launcherServoAutoPos = 0.662;
+    double launcherServoAutoPos = 0.618;
     double launcherServoShortPos = 0.332;
     double launcherServoFarPos = launcherServoAutoPos;
     double launcherServoInitPos = launcherServoAutoPos;
@@ -73,7 +73,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     double leftLiftEndPos = 0.354;
     double rightLiftEndPos = 0.664;
 
-    int launchFarServoWaitTime = 25;//milliseconds
+    int launchFarServoWaitTime = 23;//milliseconds
     int launchShortServoWaitTime = 13;//milliseconds
 
     private HashMap<String, Object> telemetryData = new HashMap<String, Object>();
@@ -283,7 +283,6 @@ public abstract class BaseOpMode extends LinearOpMode {
         rightFlapServo.setPosition(rightFlapInitPos);
         leftFlapServo.setPosition(leftFlapInitPos);
     }
-
 
     public void allInit() {
         initWheels();

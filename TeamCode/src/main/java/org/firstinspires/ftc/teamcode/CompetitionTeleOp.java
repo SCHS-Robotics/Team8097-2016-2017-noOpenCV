@@ -86,11 +86,11 @@ public class CompetitionTeleOp extends BaseOpMode {
             }
 
             //Button Pushers
-            if (gamepad1.left_bumper) {
+            if (gamepad1.left_bumper || gamepad2.left_bumper) {
                 pushButtonTime.reset();
                 leftFlapServo.setPosition(leftFlapEndPos);
                 rightFlapServo.setPosition(rightFlapEndPos);
-            } else if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 pushButtonTime.reset();
                 rightFlapServo.setPosition(rightFlapEndPos);
                 leftFlapServo.setPosition(leftFlapEndPos);

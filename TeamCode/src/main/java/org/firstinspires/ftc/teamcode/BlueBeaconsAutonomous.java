@@ -43,6 +43,11 @@ public class BlueBeaconsAutonomous extends BeaconsAutonomous {
     }
 
     @Override
+    public void fixPosForFindingTape() throws InterruptedException {
+        goBackwardDistance(DEFAULT_FORWARD_SPEED, 15);
+    }
+
+    @Override
     public void findTapeInward() throws InterruptedException {
         findTapeLeft();
     }
