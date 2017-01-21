@@ -39,7 +39,7 @@ public abstract class BaseOpMode extends LinearOpMode {
     int wheelEncoderPpr = 1680;
     int launcherEncoderPpr = 112;
     int wheelMaxRpm = 100;//theoretical 110
-    int launcherMaxRpm = 1650;//theoretical 1650, previous valye 1400
+    int launcherMaxRpm = 1450;//theoretical 1650
     Servo rightFlapServo;
     Servo leftFlapServo;
     Servo rangeServo;
@@ -101,8 +101,8 @@ public abstract class BaseOpMode extends LinearOpMode {
     }
 
     public void startLauncher() {
-        leftLaunchMotor.setPower(-1);
-        rightLaunchMotor.setPower(1);
+        leftLaunchMotor.setPower(-0.9);
+        rightLaunchMotor.setPower(0.9);
     }
 
     public void stopLauncher() {
